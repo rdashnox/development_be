@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DENO_VERSION: "2.9.4"
+  DENO_VERSION: "2.9.5"
 
   DENO_ORG: "imperionite"
   DENO_APP: "sbims"

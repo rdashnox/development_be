@@ -38,6 +38,8 @@
 
 @defaultPassword=Dev2026!
 
+@newPassword=deV2026!
+
 
 ###############################################################
 
@@ -47,7 +49,7 @@
 
 # Replace after login
 
-@adminToken=PASTE_ADMIN_ACCESS_TOKEN
+@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI4YzE2MDMzMS1kMDhkLTQ5NzUtOWJjNi02NDZiOWEyYjhlM2YiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg3NjcwMTY2LCJpYXQiOjE3ODc2NjY1NjYsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4NzY2NjU2Nn1dLCJzZXNzaW9uX2lkIjoiMjg3OWU4ZGMtZTdkOC00ZDZhLWE3MTktNTg1MjJkYmRjYjM4IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.xcUnaCdPAGUrysYJKecB0h0_jvtcBQq218Xu9p6m__PI1ZVENC9ErKlf7HzwG1j_ImrbUduQADCFWhU9K3JA_g
 
 @studentToken=PASTE_STUDENT_ACCESS_TOKEN
 
@@ -60,7 +62,7 @@
 
 # Replace after creating user
 
-@userId=REPLACE_USER_UUID
+@userId=d8b3e665-232b-4c86-abac-fe36ee1e9d4d
 
 
 
@@ -81,7 +83,7 @@ Content-Type: application/json
 
 {
   "email": "{{admin}}",
-  "password": "{{defaultPassword}}"
+  "password": "{{newPassword}}"
 }
 
 
@@ -215,7 +217,7 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "role": "faculty_adviser"
+  "role": "student"
 }
 
 

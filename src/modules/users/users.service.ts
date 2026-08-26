@@ -151,41 +151,24 @@ export class UserService {
   }
 
   async updateStatus(id: string, request: UpdateUserStatusRequest) {
-    const { error } = await this.clients.supabaseAdmin
+    const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
       .update({
         is_active: request.isActive,
       })
-      .eq("id", id);
+      .eq("id", id)
+      .select("id, is_active")
+      .single();
 
-    if (error) {
-      throw new AppError(500, error.message);
-    }
-
-    // When an account is deactivated, revoke all existing
-    // Supabase sessions for that user.
-    //
-    // The auth middleware also checks profiles.is_active on
-    // every protected request, providing a second layer of
-    // protection even if an access token remains valid.
-    if (!request.isActive) {
-      const { error: signOutError } = await this.clients.supabaseAdmin.auth.admin.signOut(
-        id,
-        "global",
+    if (error || !data) {
+      throw new AppError(
+        500,
+        error?.message ?? "Unable to update user status.",
       );
-
-      if (signOutError) {
-        throw new AppError(
-          500,
-          "User was deactivated, but existing sessions could not be revoked.",
-        );
-      }
     }
 
     return {
-      message: request.isActive
-        ? "User status updated."
-        : "User deactivated and existing sessions revoked.",
+      message: request.isActive ? "User status updated." : "User deactivated.",
     };
   }
 }
