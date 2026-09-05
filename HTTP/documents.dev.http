@@ -1,0 +1,878 @@
+*###############################################################*
+
+*# SBIMS API*
+
+*# Documents Module - FR-09*
+
+*#*
+
+*# Development Manual Test Suite*
+
+*#*
+
+*# Order of execution:*
+
+*# 1. Health Check*
+
+*# 2. Login as Student*
+
+*# 3. Upload Document*
+
+*# 4. List Internship Documents*
+
+*# 5. Retrieve Document*
+
+*# 6. Login as Internship Coordinator*
+
+*# 7. Approve Document*
+
+*# 8. Attempt Review of Already Reviewed Document*
+
+*# 9. Upload Another Document*
+
+*# 10. Reject Document*
+
+*# 11. Student Re-upload After Rejection*
+
+*# 12. Duplicate Document Test*
+
+*# 13. Student Delete Document*
+
+*# 14. Administrator Upload Authorization Test*
+
+*# 15. HTE Supervisor Access Test*
+
+*# 16. Invalid Upload Tests*
+
+*###############################################################*
+
+*###############################################################*
+
+*# Variables*
+
+*###############################################################*
+
+@apiUrl=http://localhost:8000/api/v1
+
+*###*
+
+*### Replace these values with IDs from the active test database.*
+
+@internshipId=REPLACE_WITH_INTERNSHIP_UUID
+
+@documentId=REPLACE_WITH_DOCUMENT_UUID
+
+@secondDocumentId=REPLACE_WITH_SECOND_DOCUMENT_UUID
+
+*###*
+
+*### Path to a real test file.*
+
+*### VSCode REST Client supports @filename for multipart uploads.*
+
+@testFile=./fixtures/sample-document.pdf
+
+*###############################################################*
+
+*# Seed Users*
+
+*###############################################################*
+
+@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
+
+@coordinator=[coordinatorsbims1@grr.la](mailto:coordinatorsbims1@grr.la)
+
+@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
+
+@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
+
+@hte=[htesbims1@grr.la](mailto:htesbims1@grr.la)
+
+*###############################################################*
+
+*# Password*
+
+*###############################################################*
+
+@password=Dev2026!
+
+*###############################################################*
+
+*# Access Tokens*
+
+*###############################################################*
+
+*### These are populated manually after successful login.*
+
+@studentToken=REPLACE_WITH_STUDENT_ACCESS_TOKEN
+
+@coordinatorToken=REPLACE_WITH_COORDINATOR_ACCESS_TOKEN
+
+@adminToken=REPLACE_WITH_ADMIN_ACCESS_TOKEN
+
+@facultyToken=REPLACE_WITH_FACULTY_ACCESS_TOKEN
+
+@hteToken=REPLACE_WITH_HTE_ACCESS_TOKEN
+
+*###############################################################*
+
+*# HEALTH*
+
+*###############################################################*
+
+*### Health Check*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - API is running*
+
+GET {{apiUrl}}/health
+
+*###############################################################*
+
+*# LOGIN - STUDENT*
+
+*###############################################################*
+
+*### Login as Student*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - accessToken returned*
+
+*### - Copy accessToken to @studentToken*
+
+POST {{apiUrl}}/auth/login
+
+Content-Type: application/json
+
+{
+"email": "{{student}}",
+"password": "{{password}}"
+}
+
+*###############################################################*
+
+*# UPLOAD DOCUMENT*
+
+*###############################################################*
+
+*### Upload Student Endorsement*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 201*
+
+*### - success = true*
+
+*### - document record returned*
+
+*### - status = pending*
+
+*### - document_type = endorsement*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+endorsement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="sample-document.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# LIST DOCUMENTS*
+
+*###############################################################*
+
+*### List Documents for Internship*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - data is an array*
+
+*### - uploaded endorsement appears in the list*
+
+GET {{apiUrl}}/documents/internship/{{internshipId}}
+
+Authorization: Bearer {{studentToken}}
+
+*###############################################################*
+
+*# GET DOCUMENT*
+
+*###############################################################*
+
+*### Retrieve Document Metadata and Signed URL*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - document metadata returned*
+
+*### - url contains a temporary signed download URL*
+
+GET {{apiUrl}}/documents/{{documentId}}
+
+Authorization: Bearer {{studentToken}}
+
+*###############################################################*
+
+*# LOGIN - COORDINATOR*
+
+*###############################################################*
+
+*### Login as Internship Coordinator*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - accessToken returned*
+
+*### - Copy accessToken to @coordinatorToken*
+
+POST {{apiUrl}}/auth/login
+
+Content-Type: application/json
+
+{
+"email": "{{coordinator}}",
+"password": "{{password}}"
+}
+
+*###############################################################*
+
+*# COORDINATOR LIST*
+
+*###############################################################*
+
+*### Coordinator Lists Internship Documents*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - documents are returned*
+
+GET {{apiUrl}}/documents/internship/{{internshipId}}
+
+Authorization: Bearer {{coordinatorToken}}
+
+*###############################################################*
+
+*# APPROVE DOCUMENT*
+
+*###############################################################*
+
+*### Approve Pending Document*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - status = approved*
+
+*### - reviewed_by is populated*
+
+*### - reviewed_at is populated*
+
+*### - rejection_reason = null*
+
+PATCH {{apiUrl}}/documents/{{documentId}}/approve
+
+Authorization: Bearer {{coordinatorToken}}
+
+*###############################################################*
+
+*# REVIEW ALREADY APPROVED DOCUMENT*
+
+*###############################################################*
+
+*### Attempt to Approve Already Approved Document*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 400*
+
+*### - Only pending documents can be reviewed*
+
+PATCH {{apiUrl}}/documents/{{documentId}}/approve
+
+Authorization: Bearer {{coordinatorToken}}
+
+*###############################################################*
+
+*# UPLOAD SECOND DOCUMENT*
+
+*###############################################################*
+
+*### Upload Agreement Document*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 201*
+
+*### - status = pending*
+
+*### - document_type = agreement*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+agreement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="sample-document.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# REJECT DOCUMENT*
+
+*###############################################################*
+
+*### Reject Pending Agreement*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - status = rejected*
+
+*### - rejection_reason is populated*
+
+*### - reviewed_by is populated*
+
+*### - reviewed_at is populated*
+
+PATCH {{apiUrl}}/documents/{{secondDocumentId}}/reject
+
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+"reason": "Document is incomplete. Please upload the signed version."
+}
+
+*###############################################################*
+
+*# REJECT WITHOUT REASON*
+
+*###############################################################*
+
+*### Attempt to Reject Without a Reason*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 400*
+
+*### - A rejection reason is required.*
+
+PATCH {{apiUrl}}/documents/{{secondDocumentId}}/reject
+
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+{
+"reason": ""
+}
+
+*###############################################################*
+
+*# RE-UPLOAD REJECTED DOCUMENT*
+
+*###############################################################*
+
+*### Student Re-uploads Rejected Agreement*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 201*
+
+*### - same document record is reused*
+
+*### - status returns to pending*
+
+*### - reviewed_by is cleared*
+
+*### - reviewed_at is cleared*
+
+*### - rejection_reason is cleared*
+
+*### - document_type remains agreement*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+agreement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="agreement-revised.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# DUPLICATE DOCUMENT*
+
+*###############################################################*
+
+*### Attempt Duplicate Pending Agreement Upload*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 409*
+
+*### - Existing pending document cannot be uploaded again*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+agreement
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="duplicate.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# STUDENT DELETE*
+
+*###############################################################*
+
+*### Delete Student-Owned Document*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - database metadata removed*
+
+*### - corresponding storage object removed*
+
+DELETE {{apiUrl}}/documents/{{documentId}}
+
+Authorization: Bearer {{studentToken}}
+
+*###############################################################*
+
+*# ADMINISTRATOR LOGIN*
+
+*###############################################################*
+
+*### Login as Administrator*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+POST {{apiUrl}}/auth/login
+
+Content-Type: application/json
+
+{
+"email": "{{admin}}",
+"password": "{{password}}"
+}
+
+*###############################################################*
+
+*# ADMIN UPLOAD AUTHORIZATION*
+
+*###############################################################*
+
+*### Administrator Attempts Document Upload*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 403*
+
+*### - Administrator cannot upload documents*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{adminToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+consent
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="consent.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# HTE SUPERVISOR LOGIN*
+
+*###############################################################*
+
+*### Login as HTE Supervisor*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+POST {{apiUrl}}/auth/login
+
+Content-Type: application/json
+
+{
+"email": "{{hte}}",
+"password": "{{password}}"
+}
+
+*###############################################################*
+
+*# HTE SUPERVISOR ACCESS*
+
+*###############################################################*
+
+*### HTE Supervisor Retrieves Assigned Internship Documents*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - assigned HTE internship documents are returned*
+
+GET {{apiUrl}}/documents/internship/{{internshipId}}
+
+Authorization: Bearer {{hteToken}}
+
+*###############################################################*
+
+*# UNAUTHENTICATED ACCESS*
+
+*###############################################################*
+
+*### List Documents Without Authentication*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 401*
+
+GET {{apiUrl}}/documents/internship/{{internshipId}}
+
+*###############################################################*
+
+*# INVALID DOCUMENT TYPE*
+
+*###############################################################*
+
+*### Upload With Unsupported Document Type*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 400*
+
+*### - Invalid document upload data*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+invalid_type
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="invalid.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# MISSING FILE*
+
+*###############################################################*
+
+*### Upload Without File*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 400*
+
+*### - A document file is required.*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+other
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# INVALID INTERNSHIP*
+
+*###############################################################*
+
+*### Upload Using Non-Existing Internship ID*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 403 or 404 depending on resource authorization path*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+00000000-0000-0000-0000-000000000000
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+other
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="missing-internship.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/sample-document.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# INVALID FILE TYPE*
+
+*###############################################################*
+
+*### Upload Unsupported MIME Type*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 400*
+
+*### - Unsupported file type*
+
+*### - Use an unsupported file such as .txt for this test.*
+
+*###*
+
+*### NOTE:*
+
+*### Replace the path below with an actual unsupported file.*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+other
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="unsupported.txt"
+Content-Type: text/plain
+
+< ./fixtures/unsupported.txt
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# EMPTY FILE*
+
+*###############################################################*
+
+*### Upload Empty File*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 400*
+
+*### - Empty files are rejected*
+
+*###*
+
+*### NOTE:*
+
+*### Replace the path below with an empty PDF file.*
+
+POST {{apiUrl}}/documents
+
+Authorization: Bearer {{studentToken}}
+Content-Type: multipart/form-data; boundary=----SBIMSBoundary
+
+------SBIMSBoundary
+Content-Disposition: form-data; name="internship_id"
+
+{{internshipId}}
+------SBIMSBoundary
+Content-Disposition: form-data; name="document_type"
+
+other
+------SBIMSBoundary
+Content-Disposition: form-data; name="file"; filename="empty.pdf"
+Content-Type: application/pdf
+
+< ./fixtures/empty.pdf
+------SBIMSBoundary--
+
+*###############################################################*
+
+*# FINAL DOCUMENT LIST*
+
+*###############################################################*
+
+*### Verify Final Internship Document State*
+
+*###*
+
+*### Expected:*
+
+*### - HTTP 200*
+
+*### - success = true*
+
+*### - remaining documents are returned*
+
+GET {{apiUrl}}/documents/internship/{{internshipId}}
+
+Authorization: Bearer {{studentToken}}
+
+*###############################################################*
+*# END FR-09 MANUAL TEST SUITE*
+*###############################################################*

@@ -31,6 +31,7 @@
     "test:unit:internships": "deno test --env-file=.env.test tests/unit/internships/internships.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:attendance": "deno test --env-file=.env.test tests/unit/attendance/attendance.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:evaluations": "deno test --env-file=.env.test tests/unit/evaluations/evaluations.service.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:documents": "deno test --env-file=.env.test tests/unit/documents/documents.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:infrastructure:rate-limit": "deno test --env-file=.env.test tests/unit/infrastructure/noop-rate-limit.store.test.ts --allow-read --allow-env --allow-net",
     "test:unit:middleware:rate-limit": "deno test --env-file=.env.test tests/unit/middleware/rate-limit.middleware.test.ts --allow-read --allow-env --allow-net",
     "test:smoke:upstash": "deno test --env-file=.env tests/smoke/upstash-redis.smoke.test.ts --allow-read --allow-env --allow-net",
@@ -42,6 +43,7 @@
     "test:integration:internships": "deno test --env-file=.env.test tests/integration/internships.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:attendance": "deno test --env-file=.env.test tests/integration/attendance.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:evaluations": "deno test --env-file=.env.test tests/integration/evaluations.integration.test.ts --allow-read --allow-env --allow-net",
+    "test:integration:documents": "deno test --env-file=.env.test tests/integration/documents.integration.test.ts --allow-read --allow-env --allow-net",
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {
@@ -69,5 +71,7 @@
     "org": "imperionite",
     "app": "sbims"
   },
-  "allowScripts": ["npm:workerd"]
+  "allowScripts": [
+    "npm:workerd"
+  ]
 }
