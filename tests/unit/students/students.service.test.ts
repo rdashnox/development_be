@@ -6,6 +6,9 @@ import type { SupabaseClients } from "../../../src/lib/supabase.ts";
 
 const testStudentId = "11111111-1111-1111-1111-111111111111";
 const testNonStudentId = "22222222-2222-2222-2222-222222222222";
+const testHteId = "33333333-3333-3333-3333-333333333333";
+const testFacultyAdviserId = "44444444-4444-4444-4444-444444444444";
+const testInternshipId = "55555555-5555-5555-5555-555555555555";
 
 const mockStudentProfile = {
   id: testStudentId,
@@ -17,9 +20,37 @@ const mockStudentProfile = {
   address: "Bulacan",
   emergency_contact_name: "Jane Doe",
   emergency_contact_number: "09181234567",
-  internship_status: "pending",
   created_at: "2026-01-01T00:00:00.000Z",
   updated_at: "2026-01-01T00:00:00.000Z",
+};
+
+const mockCurrentInternship = {
+  id: testInternshipId,
+  student_id: testStudentId,
+  hte_id: testHteId,
+  faculty_adviser_id: testFacultyAdviserId,
+  required_hours: 486,
+  status: "active",
+  created_at: "2026-01-02T00:00:00.000Z",
+  updated_at: "2026-01-02T00:00:00.000Z",
+  student_profiles: [
+    {
+      id: testStudentId,
+      student_number: "2026-00001",
+      program: "BS Information Technology",
+      year_level: 4,
+      section: "4A",
+    },
+  ],
+  hte_profiles: [
+    {
+      id: testHteId,
+      company_name: "Example HTE",
+      contact_person: "John Doe",
+      contact_email: "john@example.com",
+      is_active: true,
+    },
+  ],
 };
 
 type MockResponse = {
@@ -30,6 +61,8 @@ type MockResponse = {
 type MockOptions = {
   profiles?: MockResponse;
   studentProfiles?: MockResponse;
+  currentInternship?: MockResponse;
+  facultyAssignment?: MockResponse;
 };
 
 function createMockSupabase(options: MockOptions = {}) {
@@ -49,10 +82,23 @@ function createMockSupabase(options: MockOptions = {}) {
     error: null,
   };
 
+  const defaultCurrentInternship: MockResponse = {
+    data: null,
+    error: null,
+  };
+
+  const defaultFacultyAssignment: MockResponse = {
+    data: null,
+    error: null,
+  };
+
   const supabaseAdmin = {
     from(table: string) {
+      let selectedColumns = "";
+
       const builder = {
-        select(_columns?: string) {
+        select(columns?: string) {
+          selectedColumns = columns ?? "";
           return builder;
         },
 
@@ -62,7 +108,6 @@ function createMockSupabase(options: MockOptions = {}) {
             operation: "insert",
             payload: value,
           });
-
           return builder;
         },
 
@@ -72,11 +117,14 @@ function createMockSupabase(options: MockOptions = {}) {
             operation: "update",
             payload: value,
           });
-
           return builder;
         },
 
         eq(_column: string, _value: unknown) {
+          return builder;
+        },
+
+        in(_column: string, _values: unknown[]) {
           return builder;
         },
 
@@ -87,6 +135,18 @@ function createMockSupabase(options: MockOptions = {}) {
         maybeSingle() {
           if (table === "profiles") {
             return Promise.resolve(options.profiles ?? defaultProfiles);
+          }
+
+          if (table === "internships") {
+            if (selectedColumns.trim() === "id") {
+              return Promise.resolve(
+                options.facultyAssignment ?? defaultFacultyAssignment,
+              );
+            }
+
+            return Promise.resolve(
+              options.currentInternship ?? defaultCurrentInternship,
+            );
           }
 
           return Promise.resolve(
@@ -125,20 +185,55 @@ function createMockSupabase(options: MockOptions = {}) {
   };
 }
 
-Deno.test("StudentService should return student profile by ID", async () => {
-  const { supabase } = createMockSupabase({
-    studentProfiles: {
-      data: mockStudentProfile,
-      error: null,
-    },
-  });
+Deno.test(
+  "StudentService should return student profile by ID with no current internship",
+  async () => {
+    const { supabase } = createMockSupabase({
+      studentProfiles: {
+        data: mockStudentProfile,
+        error: null,
+      },
+      currentInternship: {
+        data: null,
+        error: null,
+      },
+    });
 
-  const service = new StudentService(supabase);
+    const service = new StudentService(supabase);
 
-  const result = await service.getStudent(testStudentId);
+    const result = await service.getStudent(testStudentId);
 
-  assertEquals(result, mockStudentProfile);
-});
+    assertEquals(result, {
+      ...mockStudentProfile,
+      currentInternship: null,
+    });
+  },
+);
+
+Deno.test(
+  "StudentService should return the student's current internship when present",
+  async () => {
+    const { supabase } = createMockSupabase({
+      studentProfiles: {
+        data: mockStudentProfile,
+        error: null,
+      },
+      currentInternship: {
+        data: mockCurrentInternship,
+        error: null,
+      },
+    });
+
+    const service = new StudentService(supabase);
+
+    const result = await service.getStudent(testStudentId);
+
+    assertEquals(result, {
+      ...mockStudentProfile,
+      currentInternship: mockCurrentInternship,
+    });
+  },
+);
 
 Deno.test("StudentService should reject missing student profile", async () => {
   const { supabase } = createMockSupabase({
@@ -178,11 +273,39 @@ Deno.test(
 );
 
 Deno.test(
+  "StudentService should convert current internship retrieval errors to AppError",
+  async () => {
+    const { supabase } = createMockSupabase({
+      studentProfiles: {
+        data: mockStudentProfile,
+        error: null,
+      },
+      currentInternship: {
+        data: null,
+        error: new Error("Internship database error"),
+      },
+    });
+
+    const service = new StudentService(supabase);
+
+    await assertRejects(
+      () => service.getStudent(testStudentId),
+      AppError,
+      "Unable to retrieve the student's current internship.",
+    );
+  },
+);
+
+Deno.test(
   "StudentService should return the authenticated student's profile",
   async () => {
     const { supabase } = createMockSupabase({
       studentProfiles: {
         data: mockStudentProfile,
+        error: null,
+      },
+      currentInternship: {
+        data: null,
         error: null,
       },
     });
@@ -191,7 +314,10 @@ Deno.test(
 
     const result = await service.getMyStudentProfile(testStudentId);
 
-    assertEquals(result, mockStudentProfile);
+    assertEquals(result, {
+      ...mockStudentProfile,
+      currentInternship: null,
+    });
   },
 );
 
@@ -201,21 +327,11 @@ Deno.test(
     const studentUserId = testStudentId;
 
     const createdStudent = {
-      id: studentUserId,
-      student_number: "2026-00001",
-      program: "BS Information Technology",
-      year_level: 4,
-      section: "4A",
-      contact_number: "09171234567",
-      address: "Bulacan",
+      ...mockStudentProfile,
       emergency_contact_name: "Emergency Contact",
       emergency_contact_number: "09987654321",
-      internship_status: "pending",
-      created_at: "2026-01-01T00:00:00.000Z",
-      updated_at: "2026-01-01T00:00:00.000Z",
     };
 
-    let checkCount = 0;
     const { supabase, calls } = createMockSupabase({
       profiles: {
         data: {
@@ -225,24 +341,39 @@ Deno.test(
         },
         error: null,
       },
+      currentInternship: {
+        data: null,
+        error: null,
+      },
     });
 
     const originalFrom = supabase.supabaseAdmin.from;
+    let studentProfileCheckCount = 0;
+
     supabase.supabaseAdmin.from = (table: string) => {
       // deno-lint-ignore no-explicit-any
       const builder: any = originalFrom(table);
+
       if (table === "student_profiles") {
+        const originalMaybeSingle = builder.maybeSingle;
         builder.maybeSingle = () => {
-          checkCount++;
-          if (checkCount === 1) {
+          studentProfileCheckCount++;
+
+          if (studentProfileCheckCount === 1) {
             return Promise.resolve({ data: null, error: null });
           }
-          return Promise.resolve({ data: createdStudent, error: null });
+
+          return originalMaybeSingle();
         };
+
         builder.single = () => {
-          return Promise.resolve({ data: createdStudent, error: null });
+          return Promise.resolve({
+            data: createdStudent,
+            error: null,
+          });
         };
       }
+
       return builder;
     };
 
@@ -260,7 +391,10 @@ Deno.test(
       emergencyContactNumber: "09987654321",
     });
 
-    assertEquals(result, createdStudent);
+    assertEquals(result, {
+      ...createdStudent,
+      currentInternship: null,
+    });
 
     const insertCall = calls.find(
       (call) => call.table === "student_profiles" && call.operation === "insert",
@@ -378,7 +512,6 @@ Deno.test(
         },
         error: null,
       },
-
       studentProfiles: {
         data: {
           id: testStudentId,
@@ -416,18 +549,21 @@ Deno.test("StudentService should reject empty student update", async () => {
 });
 
 Deno.test(
-  "StudentService should update student academic and internship fields",
+  "StudentService should update student academic fields without internship status",
   async () => {
     const updatedStudent = {
       ...mockStudentProfile,
       program: "BS Computer Science",
       year_level: 4,
-      internship_status: "active",
     };
 
     const { supabase, calls } = createMockSupabase({
       studentProfiles: {
         data: updatedStudent,
+        error: null,
+      },
+      currentInternship: {
+        data: null,
         error: null,
       },
     });
@@ -437,10 +573,12 @@ Deno.test(
     const result = await service.updateStudent(testStudentId, {
       program: "BS Computer Science",
       yearLevel: 4,
-      internshipStatus: "active",
     });
 
-    assertEquals(result, updatedStudent);
+    assertEquals(result, {
+      ...updatedStudent,
+      currentInternship: null,
+    });
 
     const updateCall = calls.find(
       (call) => call.table === "student_profiles" && call.operation === "update",
@@ -449,7 +587,6 @@ Deno.test(
     assertEquals(updateCall?.payload, {
       program: "BS Computer Science",
       year_level: 4,
-      internship_status: "active",
     });
   },
 );
@@ -467,6 +604,10 @@ Deno.test("StudentService should update nullable student fields", async () => {
       data: updatedStudent,
       error: null,
     },
+    currentInternship: {
+      data: null,
+      error: null,
+    },
   });
 
   const service = new StudentService(supabase);
@@ -477,7 +618,10 @@ Deno.test("StudentService should update nullable student fields", async () => {
     address: null,
   });
 
-  assertEquals(result, updatedStudent);
+  assertEquals(result, {
+    ...updatedStudent,
+    currentInternship: null,
+  });
 
   const updateCall = calls.find(
     (call) => call.table === "student_profiles" && call.operation === "update",
@@ -505,7 +649,7 @@ Deno.test(
     await assertRejects(
       () =>
         service.updateStudent(testStudentId, {
-          internshipStatus: "active",
+          program: "BS Computer Science",
         }),
       AppError,
       "Student profile not found.",
@@ -527,6 +671,10 @@ Deno.test(
         data: updatedStudent,
         error: null,
       },
+      currentInternship: {
+        data: null,
+        error: null,
+      },
     });
 
     const service = new StudentService(supabase);
@@ -536,7 +684,10 @@ Deno.test(
       address: "Updated Address",
     });
 
-    assertEquals(result, updatedStudent);
+    assertEquals(result, {
+      ...updatedStudent,
+      currentInternship: null,
+    });
 
     const updateCall = calls.find(
       (call) => call.table === "student_profiles" && call.operation === "update",
@@ -565,6 +716,10 @@ Deno.test(
         data: updatedStudent,
         error: null,
       },
+      currentInternship: {
+        data: null,
+        error: null,
+      },
     });
 
     const service = new StudentService(supabase);
@@ -576,7 +731,10 @@ Deno.test(
       emergencyContactNumber: null,
     });
 
-    assertEquals(result, updatedStudent);
+    assertEquals(result, {
+      ...updatedStudent,
+      currentInternship: null,
+    });
   },
 );
 
@@ -632,7 +790,7 @@ Deno.test(
     await assertRejects(
       () =>
         service.updateStudent(testStudentId, {
-          internshipStatus: "active",
+          program: "BS Computer Science",
         }),
       AppError,
       "Database update failed",
@@ -661,6 +819,106 @@ Deno.test(
         }),
       AppError,
       "Database update failed",
+    );
+  },
+);
+
+Deno.test(
+  "StudentService should allow an assigned faculty adviser to access the student",
+  async () => {
+    const { supabase } = createMockSupabase({
+      facultyAssignment: {
+        data: {
+          id: testInternshipId,
+        },
+        error: null,
+      },
+      studentProfiles: {
+        data: mockStudentProfile,
+        error: null,
+      },
+      currentInternship: {
+        data: mockCurrentInternship,
+        error: null,
+      },
+    });
+
+    const service = new StudentService(supabase);
+
+    const result = await service.getStudent(
+      testStudentId,
+      testFacultyAdviserId,
+      "faculty_adviser",
+    );
+
+    assertEquals(result, {
+      ...mockStudentProfile,
+      currentInternship: mockCurrentInternship,
+    });
+  },
+);
+
+Deno.test(
+  "StudentService should reject faculty adviser access when adviser is not assigned",
+  async () => {
+    const { supabase } = createMockSupabase({
+      facultyAssignment: {
+        data: null,
+        error: null,
+      },
+    });
+
+    const service = new StudentService(supabase);
+
+    await assertRejects(
+      () =>
+        service.getStudent(
+          testStudentId,
+          testFacultyAdviserId,
+          "faculty_adviser",
+        ),
+      AppError,
+      "You are not assigned to this student.",
+    );
+  },
+);
+
+Deno.test(
+  "StudentService should reject faculty adviser access when requester identity is missing",
+  async () => {
+    const { supabase } = createMockSupabase();
+
+    const service = new StudentService(supabase);
+
+    await assertRejects(
+      () => service.getStudent(testStudentId, undefined, "faculty_adviser"),
+      AppError,
+      "Faculty adviser identity is required.",
+    );
+  },
+);
+
+Deno.test(
+  "StudentService should convert faculty adviser assignment errors to AppError",
+  async () => {
+    const { supabase } = createMockSupabase({
+      facultyAssignment: {
+        data: null,
+        error: new Error("Assignment lookup failed"),
+      },
+    });
+
+    const service = new StudentService(supabase);
+
+    await assertRejects(
+      () =>
+        service.getStudent(
+          testStudentId,
+          testFacultyAdviserId,
+          "faculty_adviser",
+        ),
+      AppError,
+      "Unable to verify faculty adviser access.",
     );
   },
 );

@@ -29,41 +29,21 @@ students.get(
   requireRole("administrator", "internship_coordinator"),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
-
     const result = await studentService.listStudents();
 
-    return c.json({
-      success: true,
-      data: result,
-    });
+    return c.json({ success: true, data: result });
   },
 );
 
-/**
- * GET /students/me
- *
- * Student can view their own student profile.
- *
- * Keep this route before /:id.
- */
+/** GET /students/me */
 students.get("/me", requireAuth, requireRole("student"), async (c) => {
   const studentService = new StudentService(c.get("supabase"));
+  const result = await studentService.getMyStudentProfile(c.get("user").id);
 
-  const user = c.get("user");
-
-  const result = await studentService.getMyStudentProfile(user.id);
-
-  return c.json({
-    success: true,
-    data: result,
-  });
+  return c.json({ success: true, data: result });
 });
 
-/**
- * PATCH /students/me
- *
- * Student can update their own personal/contact data.
- */
+/** PATCH /students/me */
 students.patch(
   "/me",
   requireAuth,
@@ -71,24 +51,20 @@ students.patch(
   zValidator("json", updateMyStudentSchema),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
+    const result = await studentService.updateMyStudentProfile(
+      c.get("user").id,
+      c.req.valid("json"),
+    );
 
-    const user = c.get("user");
-    const body = c.req.valid("json");
-
-    const result = await studentService.updateMyStudentProfile(user.id, body);
-
-    return c.json({
-      success: true,
-      data: result,
-    });
+    return c.json({ success: true, data: result });
   },
 );
 
 /**
  * GET /students/:id
  *
- * Administrator, internship coordinator,
- * and faculty adviser.
+ * Faculty advisers are additionally restricted by the service to
+ * students assigned to them through an operational internship.
  */
 students.get(
   "/:id",
@@ -96,35 +72,22 @@ students.get(
   requireRole("administrator", "internship_coordinator", "faculty_adviser"),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
-
     const id = c.req.param("id");
 
     if (!id) {
       return c.json(
-        {
-          success: false,
-          message: "Student ID is required.",
-        },
+        { success: false, message: "Student ID is required." },
         400,
       );
     }
 
     const result = await studentService.getStudent(id);
 
-    return c.json({
-      success: true,
-      data: result,
-    });
+    return c.json({ success: true, data: result });
   },
 );
 
-/**
- * POST /students
- *
- * Administrator and internship coordinator
- * create a student profile for an existing
- * student user.
- */
+/** POST /students */
 students.post(
   "/",
   requireAuth,
@@ -132,27 +95,13 @@ students.post(
   zValidator("json", createStudentSchema),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
+    const result = await studentService.createStudent(c.req.valid("json"));
 
-    const body = c.req.valid("json");
-
-    const result = await studentService.createStudent(body);
-
-    return c.json(
-      {
-        success: true,
-        data: result,
-      },
-      201,
-    );
+    return c.json({ success: true, data: result }, 201);
   },
 );
 
-/**
- * PATCH /students/:id
- *
- * Administrator and internship coordinator
- * may update the complete student profile.
- */
+/** PATCH /students/:id */
 students.patch(
   "/:id",
   requireAuth,
@@ -160,15 +109,12 @@ students.patch(
   zValidator("json", updateStudentSchema),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
+    const result = await studentService.updateStudent(
+      c.req.param("id"),
+      c.req.valid("json"),
+    );
 
-    const body = c.req.valid("json");
-
-    const result = await studentService.updateStudent(c.req.param("id"), body);
-
-    return c.json({
-      success: true,
-      data: result,
-    });
+    return c.json({ success: true, data: result });
   },
 );
 

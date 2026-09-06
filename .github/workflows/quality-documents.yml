@@ -1,0 +1,17 @@
+name: Quality Check - Documents
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/_quality-module.yml
+    with:
+      module: documents
+      unit_task: test:unit:documents
+      integration_task: test:integration:documents
+    secrets: inherit

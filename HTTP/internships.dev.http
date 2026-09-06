@@ -77,26 +77,11 @@
 # VARIABLES
 
 ###############################################################
-
 @apiUrl=http://localhost:8000/api/v1
-
-### Internship ID
-
-### Replace after creating an internship.
-
-@internshipId=00000000-0000-0000-0000-000000000000
-
-### Student Profile ID
-
-### Replace after creating/retrieving the test student profile.
-
-@studentId=00000000-0000-0000-0000-000000000000
-
-### HTE Profile ID
-
-### Replace after creating the test HTE.
-
-@hteId=00000000-0000-0000-0000-000000000000
+@internshipId=dcd18ec7-6355-4da4-82ee-bbcbcdb72fb7
+@studentId=bcfb4652-2a62-4383-a986-33e838ed3631
+@hteId=38253f4d-41d8-4cb5-a658-6d012f1ce60e
+@facultyAdviserId=cd315baa-c628-4ff9-9f71-9caae86ed096
 
 ###############################################################
 
@@ -104,11 +89,11 @@
 
 ###############################################################
 
-@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
-@coordinator=[coordinatorsbims1@grr.la](mailto:coordinatorsbims1@grr.la)
-@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
-@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
-@hte=[htesbims1@grr.la](mailto:htesbims1@grr.la)
+@admin=adminsbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
+@faculty=facultysbims1@grr.la
+@student=studentsbims1@grr.la
+@hte=htesbims1@grr.la
 
 ###############################################################
 
@@ -129,17 +114,8 @@
 ### Paste a valid administrator access token here.
 
 @adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-
-### Paste a valid internship coordinator access token here.
-
 @coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
-
-### Paste a valid student access token here.
-
 @studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
-
-### Paste a valid faculty adviser access token here.
-
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 
 ###############################################################
@@ -266,100 +242,6 @@ Content-Type: application/json
 "password": "{{newPassword}}"
 }
 
-###
-
-### Expected:
-
-### HTTP 200
-
-### data.accessToken is returned
-
-###
-
-### Copy the accessToken from the response and assign it to:
-
-### @facultyAccessToken
-
-###############################################################
-
-# TEST STUDENT PROFILE
-
-###############################################################
-
-### FR-03 - Administrator Create Test Student Profile
-
-POST {{apiUrl}}/students
-Authorization: Bearer {{adminAccessToken}}
-Content-Type: application/json
-
-{
-"studentNumber": "REST-FR05-001",
-"program": "BSIT",
-"yearLevel": 4,
-"section": "A",
-"contactNumber": "09171234567",
-"address": "Test Address, Bulacan",
-"emergencyContactName": "Test Emergency Contact",
-"emergencyContactNumber": "09179876543"
-}
-
-###
-
-### Expected:
-
-### HTTP 201
-
-### success = true
-
-### data.id exists
-
-### data.student_number = "REST-FR05-001"
-
-###
-
-### Copy the returned data.id and assign it to:
-
-### @studentId
-
-###############################################################
-
-# TEST HTE PROFILE
-
-###############################################################
-
-### FR-04 - Administrator Create Test HTE
-
-POST {{apiUrl}}/htes
-Authorization: Bearer {{adminAccessToken}}
-Content-Type: application/json
-
-{
-"companyName": "REST Client FR05 Test HTE",
-"address": "Test Address, Bulacan",
-"contactPerson": "Test Contact Person",
-"contactEmail": "[fr05-test@example.com](mailto:fr05-test@example.com)",
-"contactNumber": "09171234567"
-}
-
-###
-
-### Expected:
-
-### HTTP 201
-
-### success = true
-
-### data.id exists
-
-### data.company_name = "REST Client FR05 Test HTE"
-
-### data.is_active = true
-
-###
-
-### Copy the returned data.id and assign it to:
-
-### @hteId
 
 ###############################################################
 
@@ -385,7 +267,6 @@ Authorization: Bearer {{adminAccessToken}}
 ###############################################################
 
 ### FR-05 - Internship Coordinator List Internships
-
 GET {{apiUrl}}/internships
 Authorization: Bearer {{coordinatorAccessToken}}
 
@@ -413,7 +294,8 @@ Content-Type: application/json
 
 {
 "studentId": "{{studentId}}",
-"hteId": "{{hteId}}"
+"hteId": "{{hteId}}",
+"required_hours": 550
 }
 
 ###
@@ -448,7 +330,8 @@ Content-Type: application/json
 
 {
 "studentId": "{{studentId}}",
-"hteId": "{{hteId}}"
+"hteId": "{{hteId}}",
+"requiredHours": 425
 }
 
 ###
@@ -474,7 +357,7 @@ Content-Type: application/json
 ### FR-05 - Administrator Retrieve Internship
 
 GET {{apiUrl}}/internships/{{internshipId}}
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 
 ###
 
@@ -525,10 +408,10 @@ Authorization: Bearer {{studentAccessToken}}
 
 ###############################################################
 
-### FR-05 - Administrator Activate Internship
+### FR-05 - Internship Coordinator Activate Internship
 
 PATCH {{apiUrl}}/internships/{{internshipId}}/status
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
@@ -1022,3 +905,17 @@ Content-Type: application/json
 
 ### Insufficient permissions.
 
+###############################################################
+
+## Assign Faculty Adviser to Internship
+
+###############################################################
+
+### Internship Coordinator Assign Faculty Adviser to Internship
+PATCH {{apiUrl}}/internships/{{internshipId}}/adviser
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+    "facultyAdviserId": "{{facultyAdviserId}}"
+}

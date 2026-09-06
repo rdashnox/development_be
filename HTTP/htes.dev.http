@@ -37,7 +37,7 @@
 
 ### HTE ID
 ### Replace after creating an HTE.
-@hteId=00000000-0000-0000-0000-000000000000
+@hteId=4a33b101-ead7-4349-9b88-9662710b29ed
 
 
 ###############################################################
@@ -216,11 +216,11 @@ Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
-  "companyName": "Coordinator Test HTE",
-  "address": "Coordinator Test Address",
-  "contactPerson": "Coordinator Contact",
-  "contactEmail": "coordinator@example.com",
-  "contactNumber": "09181234567"
+  "companyName": "ABC Industries",
+  "address": "Test Address, Taguig City",
+  "contactPerson": "Test ABC",
+  "contactEmail": "contact@abc-example.com",
+  "contactNumber": "09171234567"
 }
 
 ###
@@ -238,7 +238,7 @@ Content-Type: application/json
 ### FR-04 - Retrieve HTE Profile
 
 GET {{apiUrl}}/htes/{{hteId}}
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 
 ###
 
@@ -255,12 +255,12 @@ Authorization: Bearer {{adminAccessToken}}
 ### FR-04 - Update HTE Profile
 
 PATCH {{apiUrl}}/htes/{{hteId}}
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {
-  "companyName": "Updated REST Client HTE",
-  "contactPerson": "Updated Contact Person"
+  "companyName": "ABC Industries Inc.",
+  "contactPerson": "George Smith"
 }
 
 ###

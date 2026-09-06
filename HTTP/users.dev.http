@@ -36,6 +36,8 @@
 @student=studentsbims1@grr.la
 @faculty=facultysbims1@grr.la
 
+@coordinator=coordinatorsbims1@grr.la
+
 @defaultPassword=Dev2026!
 
 @newPassword=deV2026!
@@ -53,6 +55,8 @@
 
 @studentToken=PASTE_STUDENT_ACCESS_TOKEN
 
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkMTA0NmQ0OS1lZWZjLTRiZDItYmZmMi03MTcxYjJiNzViNjQiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4MzMzMzc5LCJpYXQiOjE3ODgzMjk3NzksImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4MzI5Nzc5fV0sInNlc3Npb25faWQiOiIyM2RkZTYwMS03ZmY4LTRmYjQtYTc5My1kNDcyOTRhY2M3OWYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.2NCdjic8d86ow6eYbj-ybBs-IL3t0oQo5VdNpstACuxxxbBN0jX46IlE7HyTEEtpT494yvj_GnhqvaQJz_mVUg
+
 
 ###############################################################
 
@@ -62,7 +66,7 @@
 
 # Replace after creating user
 
-@userId=d8b3e665-232b-4c86-abac-fe36ee1e9d4d
+@userId=8620a30e-6f93-4400-85f1-71ebe2b2bf57
 
 
 
@@ -86,6 +90,15 @@ Content-Type: application/json
   "password": "{{newPassword}}"
 }
 
+####
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{coordinator}}",
+  "password": "{{defaultPassword}}"
+}
+
 
 
 ###############################################################
@@ -104,7 +117,7 @@ Content-Type: application/json
 ### - Returns user list
 
 GET {{apiUrl}}/users
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{coordinatorToken}}
 
 
 
