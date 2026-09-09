@@ -19,10 +19,13 @@ const students = new Hono<{
 }>();
 
 /**
- * GET /students
- *
- * Administrator and internship coordinator only.
- */
+
+* GET /students
+*
+* Administrator and internship coordinator only.
+*
+* Returns all student profiles with their associated user/profile data.
+  */
 students.get(
   "/",
   requireAuth,
@@ -35,9 +38,32 @@ students.get(
   },
 );
 
+/**
+
+* GET /students/assigned
+*
+* Faculty advisers only.
+*
+* Returns only students assigned to the authenticated faculty adviser
+* through a pending or active internship.
+  */
+students.get(
+  "/assigned",
+  requireAuth,
+  requireRole("faculty_adviser"),
+  async (c) => {
+    const studentService = new StudentService(c.get("supabase"));
+
+    const result = await studentService.listAssignedStudents(c.get("user").id);
+
+    return c.json({ success: true, data: result });
+  },
+);
+
 /** GET /students/me */
 students.get("/me", requireAuth, requireRole("student"), async (c) => {
   const studentService = new StudentService(c.get("supabase"));
+
   const result = await studentService.getMyStudentProfile(c.get("user").id);
 
   return c.json({ success: true, data: result });
@@ -51,6 +77,7 @@ students.patch(
   zValidator("json", updateMyStudentSchema),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
+
     const result = await studentService.updateMyStudentProfile(
       c.get("user").id,
       c.req.valid("json"),
@@ -61,11 +88,12 @@ students.patch(
 );
 
 /**
- * GET /students/:id
- *
- * Faculty advisers are additionally restricted by the service to
- * students assigned to them through an operational internship.
- */
+
+* GET /students/:id
+*
+* Faculty advisers are restricted by the service to students assigned
+* to them through a pending or active internship.
+  */
 students.get(
   "/:id",
   requireAuth,
@@ -81,7 +109,22 @@ students.get(
       );
     }
 
-    const result = await studentService.getStudent(id);
+    const user = c.get("user");
+
+    const result = await studentService.getStudent(
+      id,
+      user.id,
+      (
+        user as {
+          id: string;
+          role:
+            | "administrator"
+            | "internship_coordinator"
+            | "faculty_adviser"
+            | "student";
+        }
+      ).role,
+    );
 
     return c.json({ success: true, data: result });
   },
@@ -95,6 +138,7 @@ students.post(
   zValidator("json", createStudentSchema),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
+
     const result = await studentService.createStudent(c.req.valid("json"));
 
     return c.json({ success: true, data: result }, 201);
@@ -109,6 +153,7 @@ students.patch(
   zValidator("json", updateStudentSchema),
   async (c) => {
     const studentService = new StudentService(c.get("supabase"));
+
     const result = await studentService.updateStudent(
       c.req.param("id"),
       c.req.valid("json"),

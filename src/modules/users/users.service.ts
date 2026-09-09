@@ -151,22 +151,40 @@ export class UserService {
   }
 
   async updateStatus(id: string, request: UpdateUserStatusRequest) {
+    if (!request.isActive) {
+      const { data: targetUser, error: targetUserError } = await this.clients.supabaseAdmin
+        .from("profiles")
+        .select("id, role")
+        .eq("id", id)
+        .maybeSingle();
+      if (targetUserError) {
+        throw new AppError(
+          500,
+          "Unable to verify the user before updating status.",
+        );
+      }
+      if (!targetUser) {
+        throw new AppError(404, "User not found.");
+      }
+      if (targetUser.role === "administrator") {
+        throw new AppError(
+          400,
+          "Administrator accounts cannot be deactivated.",
+        );
+      }
+    }
     const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
-      .update({
-        is_active: request.isActive,
-      })
+      .update({ is_active: request.isActive })
       .eq("id", id)
       .select("id, is_active")
-      .single();
-
-    if (error || !data) {
-      throw new AppError(
-        500,
-        error?.message ?? "Unable to update user status.",
-      );
+      .maybeSingle();
+    if (error) {
+      throw new AppError(500, "Unable to update user status.");
     }
-
+    if (!data) {
+      throw new AppError(404, "User not found.");
+    }
     return {
       message: request.isActive ? "User status updated." : "User deactivated.",
     };

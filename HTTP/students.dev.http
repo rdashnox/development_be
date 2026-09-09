@@ -1,9 +1,5 @@
 ###############################################################
 
-# SBIMS API
-
-#
-
 # Student Internship Profile Module (FR-03)
 
 #
@@ -12,23 +8,41 @@
 
 #
 
-# 1. Login Administrator
+# 1. Login Coordinator
 
 # 2. Login Student
 
-# 3. Create Student Profile
+# 3. Login Faculty Adviser
 
-# 4. Retrieve Student Profile
+# 4. Login Administrator
 
-# 5. Student Retrieve Own Profile
+# 5. Create Student Profile
 
-# 6. Student Update Own Information
+# 6. Duplicate Student Profile
 
-# 7. Verify Protected Fields
+# 7. Retrieve Student Profile + User Profile
 
-# 8. Authorization Tests
+# 8. Student Retrieve Own Profile + User Profile
 
-# 9. Unauthenticated Access
+# 9. Student Update Own Information
+
+# 10. Verify Protected Fields
+
+# 11. Coordinator Retrieves All Students
+
+# 12. Faculty Adviser Retrieves Assigned Students
+
+# 13. Faculty Adviser Retrieves Assigned Student By ID
+
+# 14. Faculty Adviser Cannot Retrieve Unassigned Student
+
+# 15. Authorization Tests
+
+# 16. Unauthenticated Access
+
+# 17. Final Student Profile Verification
+
+#
 
 ###############################################################
 
@@ -50,9 +64,19 @@
 @student=studentsbims1@grr.la
 @faculty=facultysbims1@grr.la
 @coordinator=coordinatorsbims1@grr.la
-
+###
 @defaultPassword=Dev2026!
 @newPassword=deV2026!
+
+###############################################################
+
+# User IDs
+
+#
+
+# Replace adminUserId with the ID returned by administrator login.
+
+###############################################################
 
 @adminUserId=ADD_HERE
 @studentUserId=bcfb4652-2a62-4383-a986-33e838ed3631
@@ -63,40 +87,66 @@
 
 # Tokens
 
-###############################################################
+#
 
-# Replace after login
+# Replace these after performing the corresponding login.
+
+###############################################################
 
 @adminToken=PASTE_ADMIN_ACCESS_TOKEN
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiY2ZiNDY1Mi0yYTYyLTQzODMtYTk4Ni0zM2U4MzhlZDM2MzEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODgyMTI2LCJpYXQiOjE3ODg4Nzg1MjYsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg4Nzg1MjZ9XSwic2Vzc2lvbl9pZCI6IjBkNzFmNWU0LWQwMDUtNGFjYy04MDk2LTUxODUzMmVmNmZjYiIsImlzX2Fub255bW91cyI6ZmFsc2V9.H4ZSBA9vutYIZQ-oaPw-nThaUfQahk1iZ7XKzXW3KCKCeTViD8AvIv3TnCapkNpO8MdfnGafaqUZ-Fwm7OuTYA
+@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjZDMxNWJhYS1jNjI4LTRmZjktOWY3MS05Y2FhZTg2ZWQwOTYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODgyNTYzLCJpYXQiOjE3ODg4Nzg5NjMsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInN1ZmZpeCI6IkpyLiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4ODc4OTYzfV0sInNlc3Npb25faWQiOiJlNjAzNGQ0MC1kYzMzLTRlYjctYjBiOS1hZWU3YWIxMjczYWYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.3XEexUBa8PGhEyYPjwNOOF_sQeyLs7bhox_lTISqwIOafbtOhzDhVWp8g6PgT80NvhWMexyX3ql2bTwBvVKAEg
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODgyMDYxLCJpYXQiOjE3ODg4Nzg0NjEsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4ODc4NDYxfV0sInNlc3Npb25faWQiOiI3NDZmM2E4OS1iYWRmLTQzYzMtOTgxZi0xM2Y1ODk5M2I5MDMiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.Ws8WVbsnTzKZINzwucVoXVIs5zqBxvrl5kLOrQ3Oju4uBXrDJQG6nN908vRsk-vypJO8qxSoFDeSu3Fp-iz3nQ
 
-@studentToken=PASTE_STUDENT_TOKEN
-
-@facultyToken=PASTE_FACULTY_ACCESS_TOKEN
-@coordinatorToken=PASTE_COORDINATOR_ACCESS_TOKEN
 ###############################################################
-### Student Info
+
+# Student Info
+
+###############################################################
+
 @studentNumber=20260001
 
+###############################################################
+
+# Known Internship
+
+#
+
+# This student is expected to have an operational internship
+
+# assigned to the faculty adviser above.
+
+#
+
+# Use this student for faculty "assigned" tests.
 
 ###############################################################
 
-###############################################################
-
-# LOGIN ADMINISTRATOR
+@assignedStudentId={{studentUserId}}
 
 ###############################################################
 
-### Login Administrator
+# Optional Unassigned Student
 
-### Expected:
+#
 
-### - HTTP 200
+# Replace this with another student profile ID that is NOT
 
-### - success = true
+# assigned to @facultyUserId.
 
-### - accessToken returned
+#
 
-### - user.id returned
+# This is required for the faculty 403 test.
+
+###############################################################
+
+@unassignedStudentId=ADD_UNASSIGNED_STUDENT_ID
+
+###############################################################
+
+# LOGIN INTERNSHIP COORDINATOR
+
+###############################################################
 
 POST {{apiUrl}}/auth/login
 Content-Type: application/json
@@ -112,18 +162,6 @@ Content-Type: application/json
 
 ###############################################################
 
-### Login Student
-
-### Expected:
-
-### - HTTP 200
-
-### - success = true
-
-### - accessToken returned
-
-### - user.id returned
-
 POST {{apiUrl}}/auth/login
 Content-Type: application/json
 
@@ -132,12 +170,31 @@ Content-Type: application/json
 "password": "{{newPassword}}"
 }
 
-####
+###############################################################
+
+# LOGIN FACULTY ADVISER
+
+###############################################################
+
 POST {{apiUrl}}/auth/login
 Content-Type: application/json
 
 {
 "email": "{{faculty}}",
+"password": "{{newPassword}}"
+}
+
+###############################################################
+
+# LOGIN ADMINISTRATOR
+
+###############################################################
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+"email": "{{admin}}",
 "password": "{{newPassword}}"
 }
 
@@ -149,9 +206,15 @@ Content-Type: application/json
 
 ### Coordinator Creates Student Profile
 
+###
+
 ### Permission:
 
 ### - administrator
+
+### - internship_coordinator
+
+###
 
 ### Expected:
 
@@ -162,6 +225,12 @@ Content-Type: application/json
 ### - Student profile created
 
 ### - id matches student user ID
+
+### - profiles relationship is returned
+
+### - profiles.id matches student user ID
+
+### - profiles.role = student
 
 POST {{apiUrl}}/students
 Authorization: Bearer {{coordinatorToken}}
@@ -187,7 +256,7 @@ Content-Type: application/json
 
 ### Administrator Attempts Duplicate Profile
 
-### Run after successful profile creation.
+###
 
 ### Expected:
 
@@ -213,11 +282,13 @@ Content-Type: application/json
 
 ###############################################################
 
-# FR-03 RETRIEVE STUDENT PROFILE
+# FR-03 RETRIEVE STUDENT PROFILE BY ID
 
 ###############################################################
 
 ### Internship Coordinator Retrieves Student Profile
+
+###
 
 ### Expected:
 
@@ -228,6 +299,20 @@ Content-Type: application/json
 ### - Profile returned
 
 ### - id = student user ID
+
+### - profiles object exists
+
+### - profiles.id = student user ID
+
+### - profiles.email is returned
+
+### - profiles.first_name is returned
+
+### - profiles.last_name is returned
+
+### - profiles.role = student
+
+### - profiles.is_active = true
 
 GET {{apiUrl}}/students/{{studentUserId}}
 Authorization: Bearer {{coordinatorToken}}
@@ -240,6 +325,8 @@ Authorization: Bearer {{coordinatorToken}}
 
 ### Student Self-Service
 
+###
+
 ### Expected:
 
 ### - HTTP 200
@@ -247,6 +334,12 @@ Authorization: Bearer {{coordinatorToken}}
 ### - success = true
 
 ### - Student's own profile returned
+
+### - profiles object exists
+
+### - profiles.id = authenticated student ID
+
+### - profiles.role = student
 
 GET {{apiUrl}}/students/me
 Authorization: Bearer {{studentToken}}
@@ -259,6 +352,8 @@ Authorization: Bearer {{studentToken}}
 
 ### Student Updates Editable Information
 
+###
+
 ### Expected:
 
 ### - HTTP 200
@@ -266,6 +361,8 @@ Authorization: Bearer {{studentToken}}
 ### - contact_number updated
 
 ### - address updated
+
+### - profiles relationship remains present
 
 PATCH {{apiUrl}}/students/me
 Authorization: Bearer {{studentToken}}
@@ -284,6 +381,8 @@ Content-Type: application/json
 
 ### Verify Editable Information
 
+###
+
 ### Expected:
 
 ### - HTTP 200
@@ -292,16 +391,20 @@ Content-Type: application/json
 
 ### - Updated address returned
 
+### - profiles object still returned
+
 GET {{apiUrl}}/students/me
 Authorization: Bearer {{studentToken}}
 
 ###############################################################
 
-# FR-03 PROTECTED FIELD TEST
+# FR-03 VERIFY PROTECTED FIELDS
 
 ###############################################################
 
 ### Student Attempts To Modify Protected Fields
+
+###
 
 ### Protected fields:
 
@@ -311,13 +414,27 @@ Authorization: Bearer {{studentToken}}
 
 ### - yearLevel
 
-### - internshipStatus
+###
+
+### internshipStatus is intentionally NOT included because
+
+### it was removed from student_profiles.
+
+###
 
 ### Expected:
 
-### - HTTP 400 or 403
+### - HTTP 200 because unknown/protected fields are not part
 
-### - Protected fields remain unchanged
+### of updateMyStudentSchema
+
+### - Only allowed fields are processed
+
+### - studentNumber remains unchanged
+
+### - program remains unchanged
+
+### - yearLevel remains unchanged
 
 PATCH {{apiUrl}}/students/me
 Authorization: Bearer {{studentToken}}
@@ -326,13 +443,12 @@ Content-Type: application/json
 {
 "studentNumber": "HACKED-STUDENT-NUMBER",
 "program": "Hacked Program",
-"yearLevel": 1,
-"internshipStatus": "completed"
+"yearLevel": 1
 }
 
 ###############################################################
 
-# VERIFY PROTECTED FIELDS
+# FR-03 VERIFY PROTECTED FIELDS WERE NOT MODIFIED
 
 ###############################################################
 
@@ -357,6 +473,8 @@ Authorization: Bearer {{studentToken}}
 
 ### Student Attempts Staff Profile Endpoint
 
+###
+
 ### Expected:
 
 ### - HTTP 403 Forbidden
@@ -366,21 +484,162 @@ Authorization: Bearer {{studentToken}}
 
 ###############################################################
 
-# FR-03 FACULTY AUTHORIZATION TEST
+# FR-03 COORDINATOR GETS ALL STUDENTS
+
+###############################################################
+
+### Internship Coordinator Retrieves All Students
+
+###
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - data is an array
+
+### - Each student contains profiles
+
+### - profiles.id corresponds to student id
+
+### - profiles.role = student
+
+### - currentInternship is present when applicable
+
+GET {{apiUrl}}/students
+Authorization: Bearer {{coordinatorToken}}
+
+###############################################################
+
+# FR-03 ADMINISTRATOR GETS ALL STUDENTS
+
+###############################################################
+
+### Administrator Retrieves All Students
+
+###
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - data is an array
+
+### - Each student contains profiles
+
+GET {{apiUrl}}/students
+Authorization: Bearer {{adminToken}}
+
+###############################################################
+
+# FR-03 FACULTY GETS ASSIGNED STUDENTS
+
+###############################################################
+
+### Faculty Adviser Retrieves Assigned Students
+
+###
+
+### Endpoint:
+
+### GET /students/assigned
+
+###
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - data is an array
+
+### - Only students assigned to the authenticated faculty adviser
+
+### are returned
+
+### - Assignment must be through a pending or active internship
+
+### - Each student contains profiles
+
+### - Each student contains currentInternship
+
+### - currentInternship.faculty_adviser_id matches faculty user ID
+
+GET {{apiUrl}}/students/assigned
+Authorization: Bearer {{facultyToken}}
+
+###############################################################
+
+# FR-03 FACULTY RETRIEVES ASSIGNED STUDENT BY ID
+
+###############################################################
+
+### Faculty Adviser Retrieves Assigned Student
+
+###
+
+### Expected:
+
+### - HTTP 200
+
+### - success = true
+
+### - Student is returned
+
+### - profiles object is returned
+
+### - currentInternship is returned
+
+### - currentInternship.faculty_adviser_id matches faculty user ID
+
+GET {{apiUrl}}/students/{{assignedStudentId}}
+Authorization: Bearer {{facultyToken}}
+
+###############################################################
+
+# FR-03 FACULTY CANNOT RETRIEVE UNASSIGNED STUDENT
+
+###############################################################
+
+### Faculty Adviser Attempts To Retrieve Unassigned Student
+
+###
+
+### Replace @unassignedStudentId with a student that is NOT
+
+### assigned to @facultyUserId.
+
+###
+
+### Expected:
+
+### - HTTP 403 Forbidden
+
+### - Student profile is not exposed
+
+GET {{apiUrl}}/students/{{unassignedStudentId}}
+Authorization: Bearer {{facultyToken}}
+
+###############################################################
+
+# FR-03 FACULTY CANNOT CREATE STUDENT PROFILE
 
 ###############################################################
 
 ### Faculty Adviser Attempts To Create Student Profile
 
-### Note:
-
-### Use a user ID that does not already have a student profile
-
-### when testing authorization so that 409 does not mask 403.
+###
 
 ### Expected:
 
 ### - HTTP 403 Forbidden
+
+### - Authorization is checked before service logic
 
 POST {{apiUrl}}/students
 Authorization: Bearer {{facultyToken}}
@@ -406,6 +665,8 @@ Content-Type: application/json
 
 ### Student Attempts To Create Own Profile
 
+###
+
 ### Expected:
 
 ### - HTTP 403 Forbidden
@@ -430,11 +691,47 @@ Content-Type: application/json
 
 ###############################################################
 
-# FR-03 UNAUTHENTICATED ACCESS
+# FR-03 STUDENT CANNOT VIEW ALL STUDENTS
+
+###############################################################
+
+### Student Attempts To Retrieve All Students
+
+###
+
+### Expected:
+
+### - HTTP 403 Forbidden
+
+GET {{apiUrl}}/students
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# FR-03 STUDENT CANNOT VIEW ASSIGNED STUDENTS
+
+###############################################################
+
+### Student Attempts Faculty Adviser Endpoint
+
+###
+
+### Expected:
+
+### - HTTP 403 Forbidden
+
+GET {{apiUrl}}/students/assigned
+Authorization: Bearer {{studentToken}}
+
+###############################################################
+
+# FR-03 UNAUTHENTICATED ACCESS - /students/me
 
 ###############################################################
 
 ### Missing Token - Student Profile
+
+###
 
 ### Expected:
 
@@ -444,11 +741,13 @@ GET {{apiUrl}}/students/me
 
 ###############################################################
 
-# FR-03 UNAUTHENTICATED ACCESS BY ID
+# FR-03 UNAUTHENTICATED ACCESS - /students/:id
 
 ###############################################################
 
 ### Missing Token - Student Profile By ID
+
+###
 
 ### Expected:
 
@@ -458,11 +757,45 @@ GET {{apiUrl}}/students/{{studentUserId}}
 
 ###############################################################
 
-# FR-03 VERIFY FINAL STUDENT PROFILE
+# FR-03 UNAUTHENTICATED ACCESS - /students
+
+###############################################################
+
+### Missing Token - All Students
+
+###
+
+### Expected:
+
+### - HTTP 401 Unauthorized
+
+GET {{apiUrl}}/students
+
+###############################################################
+
+# FR-03 UNAUTHENTICATED ACCESS - /students/assigned
+
+###############################################################
+
+### Missing Token - Assigned Students
+
+###
+
+### Expected:
+
+### - HTTP 401 Unauthorized
+
+GET {{apiUrl}}/students/assigned
+
+###############################################################
+
+# FR-03 FINAL STUDENT PROFILE VERIFICATION
 
 ###############################################################
 
 ### Final Student Self-Service Verification
+
+###
 
 ### Expected:
 
@@ -472,16 +805,13 @@ GET {{apiUrl}}/students/{{studentUserId}}
 
 ### - id matches authenticated student
 
+### - profiles exists
+
+### - profiles.id matches authenticated student
+
+### - profiles.role = student
+
 ### - Editable information is preserved
 
 GET {{apiUrl}}/students/me
 Authorization: Bearer {{studentToken}}
-
-
-###############################################################
-
-# GET ALL STUDENTS BY COORDINATOR
-
-###############################################################
-GET {{apiUrl}}/students
-Authorization: Bearer {{coordinatorToken}}

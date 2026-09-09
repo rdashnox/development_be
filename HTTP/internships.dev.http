@@ -78,7 +78,7 @@
 
 ###############################################################
 @apiUrl=http://localhost:8000/api/v1
-@internshipId=dcd18ec7-6355-4da4-82ee-bbcbcdb72fb7
+@internshipId=5d21d1c0-65e5-4fc5-93e4-4191c5d0ee5f
 @studentId=bcfb4652-2a62-4383-a986-33e838ed3631
 @hteId=38253f4d-41d8-4cb5-a658-6d012f1ce60e
 @facultyAdviserId=cd315baa-c628-4ff9-9f71-9caae86ed096
@@ -114,7 +114,7 @@
 ### Paste a valid administrator access token here.
 
 @adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4Njc1OTYyLCJpYXQiOjE3ODg2NzIzNjIsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4NjcyMzYyfV0sInNlc3Npb25faWQiOiI2MGYwNDIyNC0wNGMyLTQ2ZTQtYmM3Yy02ZGE5YWFiNGY2NWEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.esJi4RNYoL10X3NvD4rKDBq5klIjhetzmSgYKZzr0OUFHbLYv351cL0lHTXRH8mP8TxXv5zLAOtANP_Blrfg0A
 @studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 

@@ -1,3 +1,19 @@
+export interface StudentUserProfile {
+  id: string;
+  email: string;
+  first_name: string;
+  middle_name: string | null;
+  last_name: string;
+  suffix: string | null;
+  role:
+    | "administrator"
+    | "internship_coordinator"
+    | "faculty_adviser"
+    | "student"
+    | "hte_supervisor";
+  is_active: boolean;
+}
+
 export interface CurrentInternship {
   id: string;
   student_id: string;
@@ -33,6 +49,7 @@ export interface StudentProfile {
   address: string | null;
   emergency_contact_name: string | null;
   emergency_contact_number: string | null;
+  profiles: StudentUserProfile;
   currentInternship: CurrentInternship | null;
   created_at: string;
   updated_at: string;

@@ -8,17 +8,7 @@ import type {
 } from "./students.types.ts";
 
 const STUDENT_SELECT = `
-  id,
-  student_number,
-  program,
-  year_level,
-  section,
-  contact_number,
-  address,
-  emergency_contact_name,
-  emergency_contact_number,
-  created_at,
-  updated_at
+  id, student_number, program, year_level, section, contact_number, address, emergency_contact_name, emergency_contact_number, created_at, updated_at, profiles ( id, email, first_name, middle_name, last_name, suffix, role, is_active )
 `;
 
 const CURRENT_INTERNSHIP_SELECT = `
@@ -94,6 +84,54 @@ export class StudentService {
 
     return Promise.all(
       data.map((student) => this.buildStudentResponse(student)),
+    );
+  }
+
+  /**
+
+Returns only students assigned to the specified faculty adviser
+through a pending or active internship.
+  */
+  async listAssignedStudents(facultyAdviserId: string) {
+    const { data: internships, error: internshipError } = await this.clients.supabaseAdmin
+      .from("internships")
+      .select("student_id")
+      .eq("faculty_adviser_id", facultyAdviserId)
+      .in("status", ["pending", "active"]);
+    if (internshipError) {
+      throw new AppError(500, "Unable to retrieve assigned students.");
+    }
+
+    if (!internships || internships.length === 0) {
+      return [];
+    }
+
+    const studentIds = [
+      ...new Set(
+        internships.map((internship) => internship.student_id).filter(Boolean),
+      ),
+    ];
+
+    if (studentIds.length === 0) {
+      return [];
+    }
+
+    const { data: students, error: studentError } = await this.clients.supabaseAdmin
+      .from("student_profiles")
+      .select(STUDENT_SELECT)
+      .in("id", studentIds)
+      .order("created_at", { ascending: false });
+
+    if (studentError) {
+      throw new AppError(500, "Unable to retrieve assigned student profiles.");
+    }
+
+    if (!students) {
+      return [];
+    }
+
+    return Promise.all(
+      students.map((student) => this.buildStudentResponse(student)),
     );
   }
 
@@ -215,13 +253,21 @@ export class StudentService {
       ...(request.studentNumber !== undefined && {
         student_number: request.studentNumber,
       }),
-      ...(request.program !== undefined && { program: request.program }),
-      ...(request.yearLevel !== undefined && { year_level: request.yearLevel }),
-      ...(request.section !== undefined && { section: request.section }),
+      ...(request.program !== undefined && {
+        program: request.program,
+      }),
+      ...(request.yearLevel !== undefined && {
+        year_level: request.yearLevel,
+      }),
+      ...(request.section !== undefined && {
+        section: request.section,
+      }),
       ...(request.contactNumber !== undefined && {
         contact_number: request.contactNumber,
       }),
-      ...(request.address !== undefined && { address: request.address }),
+      ...(request.address !== undefined && {
+        address: request.address,
+      }),
       ...(request.emergencyContactName !== undefined && {
         emergency_contact_name: request.emergencyContactName,
       }),
@@ -263,7 +309,9 @@ export class StudentService {
       ...(request.contactNumber !== undefined && {
         contact_number: request.contactNumber,
       }),
-      ...(request.address !== undefined && { address: request.address }),
+      ...(request.address !== undefined && {
+        address: request.address,
+      }),
       ...(request.emergencyContactName !== undefined && {
         emergency_contact_name: request.emergencyContactName,
       }),
