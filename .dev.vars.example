@@ -12,3 +12,5 @@ FRONTEND_URL=http://localhost:5173
 
 RATE_LIMIT_ENABLED=true
 PORT=8787
+
+SEED_USER_PASSWORD=your-development-password

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const roleSchema = z.enum([
+export const roleSchema = z.enum([
   "administrator",
   "internship_coordinator",
   "faculty_adviser",

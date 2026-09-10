@@ -33,3 +33,7 @@ export interface UpdateUserRequest {
 export interface UpdateUserRoleRequest {
   role: AuthRole;
 }
+
+export interface ListUsersByRoleRequest {
+  role: AuthRole;
+}

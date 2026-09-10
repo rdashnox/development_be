@@ -3,8 +3,7 @@ import { AppError } from "../../errors/app-error.ts";
 
 import type { CreateHTERequest, UpdateHTERequest, UpdateHTEStatusRequest } from "./htes.types.ts";
 
-const HTE_SELECT = `
-  id,
+const HTE_SELECT = `  id,
   company_name,
   address,
   contact_person,
@@ -13,11 +12,43 @@ const HTE_SELECT = `
   supervisor_id,
   is_active,
   created_at,
-  updated_at
+  updated_at`;
+
+const HTE_STUDENTS_SELECT = `
+  id,
+  student_id,
+  hte_id,
+  faculty_adviser_id,
+  required_hours,
+  status,
+  created_at,
+  updated_at,
+  student_profiles (
+    id,
+    student_number,
+    program,
+    year_level,
+    section,
+    contact_number,
+    address,
+    emergency_contact_name,
+    emergency_contact_number,
+    created_at,
+    updated_at,
+    profiles (
+      id,
+      email,
+      first_name,
+      middle_name,
+      last_name,
+      suffix
+    )
+  )
 `;
 
 export class HteService {
   constructor(private readonly clients: SupabaseClients) {}
+
   async listHtes() {
     const { data, error } = await this.clients.supabaseAdmin
       .from("hte_profiles")
@@ -49,6 +80,92 @@ export class HteService {
     }
 
     return data;
+  }
+
+  /**
+
+* Returns all operational student internships associated
+* with the specified HTE.
+*
+* Operational internships are limited to pending and active.
+* Completed internships are intentionally excluded.
+  */
+  async listHteStudents(hteId: string) {
+    const { data: hte, error: hteError } = await this.clients.supabaseAdmin
+      .from("hte_profiles")
+      .select("id")
+      .eq("id", hteId)
+      .maybeSingle();
+
+    if (hteError) {
+      throw new AppError(500, "Unable to verify HTE profile.");
+    }
+
+    if (!hte) {
+      throw new AppError(404, "HTE profile not found.");
+    }
+
+    const { data, error } = await this.clients.supabaseAdmin
+      .from("internships")
+      .select(HTE_STUDENTS_SELECT)
+      .eq("hte_id", hteId)
+      .in("status", ["pending", "active"])
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      throw new AppError(
+        500,
+        "Unable to retrieve student interns for this HTE.",
+      );
+    }
+
+    return data ?? [];
+  }
+
+  /**
+
+* Returns all operational student internships associated
+* with the HTE assigned to the authenticated HTE supervisor.
+*
+* The supervisor ID comes from the authenticated user and is
+* never accepted from the client.
+  */
+  async listMyStudents(supervisorId: string) {
+    const { data: htes, error: hteError } = await this.clients.supabaseAdmin
+      .from("hte_profiles")
+      .select(HTE_SELECT)
+      .eq("supervisor_id", supervisorId)
+      .eq("is_active", true);
+
+    if (hteError) {
+      throw new AppError(
+        500,
+        "Unable to retrieve HTE assignments for the supervisor.",
+      );
+    }
+
+    if (!htes || htes.length === 0) {
+      return [];
+    }
+
+    const hteIds = htes.map((hte) => hte.id);
+
+    const { data, error } = await this.clients.supabaseAdmin
+      .from("internships")
+      .select(HTE_STUDENTS_SELECT)
+      .in("hte_id", hteIds)
+      .in("status", ["pending", "active"])
+      .order("created_at", {
+        ascending: false,
+      });
+
+    if (error) {
+      throw new AppError(500, "Unable to retrieve your student interns.");
+    }
+
+    return data ?? [];
   }
 
   async createHte(request: CreateHTERequest) {

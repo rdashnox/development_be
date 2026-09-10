@@ -1,31 +1,21 @@
 import type { SupabaseClients } from "../../lib/supabase.ts";
-
 import { AppError } from "../../errors/app-error.ts";
-
 import type {
   CreateUserRequest,
   UpdateUserRequest,
   UpdateUserRoleRequest,
   UpdateUserStatusRequest,
 } from "./users.types.ts";
+import type { AuthRole } from "../auth/auth.types.ts";
 
 export class UserService {
   constructor(private readonly clients: SupabaseClients) {}
+
   async listUsers() {
     const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
       .select(
-        `
-        id,
-        email,
-        first_name,
-        middle_name,
-        last_name,
-        suffix,
-        role,
-        is_active,
-        created_at
-      `,
+        "id, email, first_name, middle_name, last_name, suffix, role, is_active, created_at",
       )
       .order("created_at", {
         ascending: false,
@@ -38,25 +28,32 @@ export class UserService {
     return data;
   }
 
+  async listUsersByRole(role: AuthRole) {
+    const { data, error } = await this.clients.supabaseAdmin
+      .from("profiles")
+      .select(
+        "id, email, first_name, middle_name, last_name, suffix, role, is_active",
+      )
+      .eq("role", role)
+      .order("last_name", {
+        ascending: true,
+      })
+      .order("first_name", {
+        ascending: true,
+      });
+
+    if (error) {
+      throw new AppError(500, "Unable to retrieve users by role.");
+    }
+
+    return data;
+  }
+
   async getUser(id: string) {
     const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
       .select(
-        `
-        id,
-        email,
-        first_name,
-        middle_name,
-        last_name,
-        suffix,
-        role,
-        is_active,
-        must_change_password,
-        last_login_at,
-        last_password_changed_at,
-        created_at,
-        updated_at
-      `,
+        "id, email, first_name, middle_name, last_name, suffix, role, is_active, must_change_password, last_login_at, last_password_changed_at, created_at, updated_at",
       )
       .eq("id", id)
       .single();
@@ -157,15 +154,18 @@ export class UserService {
         .select("id, role")
         .eq("id", id)
         .maybeSingle();
+
       if (targetUserError) {
         throw new AppError(
           500,
           "Unable to verify the user before updating status.",
         );
       }
+
       if (!targetUser) {
         throw new AppError(404, "User not found.");
       }
+
       if (targetUser.role === "administrator") {
         throw new AppError(
           400,
@@ -173,18 +173,24 @@ export class UserService {
         );
       }
     }
+
     const { data, error } = await this.clients.supabaseAdmin
       .from("profiles")
-      .update({ is_active: request.isActive })
+      .update({
+        is_active: request.isActive,
+      })
       .eq("id", id)
       .select("id, is_active")
       .maybeSingle();
+
     if (error) {
       throw new AppError(500, "Unable to update user status.");
     }
+
     if (!data) {
       throw new AppError(404, "User not found.");
     }
+
     return {
       message: request.isActive ? "User status updated." : "User deactivated.",
     };

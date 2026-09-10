@@ -25,3 +25,5 @@ node_modules/
 # Wrangler generated files
 .wrangler/
 worker-configuration.d.ts
+supabase/migrations/.DS_Store
+supabase/.DS_Store

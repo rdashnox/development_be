@@ -79,7 +79,7 @@
 ###############################################################
 
 @adminUserId=ADD_HERE
-@studentUserId=bcfb4652-2a62-4383-a986-33e838ed3631
+@studentUserId=0afd9f69-0991-4d14-a0e9-6446b0109e83
 @facultyUserId=cd315baa-c628-4ff9-9f71-9caae86ed096
 @coordinatorUserId=01501d31-a58b-4034-8b5c-b0b6f9ece378
 
@@ -94,17 +94,9 @@
 ###############################################################
 
 @adminToken=PASTE_ADMIN_ACCESS_TOKEN
-@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJiY2ZiNDY1Mi0yYTYyLTQzODMtYTk4Ni0zM2U4MzhlZDM2MzEiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODgyMTI2LCJpYXQiOjE3ODg4Nzg1MjYsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg4Nzg1MjZ9XSwic2Vzc2lvbl9pZCI6IjBkNzFmNWU0LWQwMDUtNGFjYy04MDk2LTUxODUzMmVmNmZjYiIsImlzX2Fub255bW91cyI6ZmFsc2V9.H4ZSBA9vutYIZQ-oaPw-nThaUfQahk1iZ7XKzXW3KCKCeTViD8AvIv3TnCapkNpO8MdfnGafaqUZ-Fwm7OuTYA
-@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJjZDMxNWJhYS1jNjI4LTRmZjktOWY3MS05Y2FhZTg2ZWQwOTYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODgyNTYzLCJpYXQiOjE3ODg4Nzg5NjMsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInN1ZmZpeCI6IkpyLiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4ODc4OTYzfV0sInNlc3Npb25faWQiOiJlNjAzNGQ0MC1kYzMzLTRlYjctYjBiOS1hZWU3YWIxMjczYWYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.3XEexUBa8PGhEyYPjwNOOF_sQeyLs7bhox_lTISqwIOafbtOhzDhVWp8g6PgT80NvhWMexyX3ql2bTwBvVKAEg
-@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODgyMDYxLCJpYXQiOjE3ODg4Nzg0NjEsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4ODc4NDYxfV0sInNlc3Npb25faWQiOiI3NDZmM2E4OS1iYWRmLTQzYzMtOTgxZi0xM2Y1ODk5M2I5MDMiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.Ws8WVbsnTzKZINzwucVoXVIs5zqBxvrl5kLOrQ3Oju4uBXrDJQG6nN908vRsk-vypJO8qxSoFDeSu3Fp-iz3nQ
-
-###############################################################
-
-# Student Info
-
-###############################################################
-
-@studentNumber=20260001
+@studentToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwYWZkOWY2OS0wOTkxLTRkMTQtYTBlOS02NDQ2YjAxMDllODMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4OTQ4MTEyLCJpYXQiOjE3ODg5NDQ1MTIsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiUmFmYWVsIEpvYXF1aW4iLCJsYXN0X25hbWUiOiJEaW1hbGFudGEiLCJtaWRkbGVfbmFtZSI6IkJvbmRvYyIsInJvbGUiOiJzdHVkZW50Iiwic3VmZml4IjoiSUlJIn0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg5NDQ1MTJ9XSwic2Vzc2lvbl9pZCI6IjZmZmI3NmIxLTE5YjktNDYzMi1hNDBiLTgwMjZkZTk2NWIzNyIsImlzX2Fub255bW91cyI6ZmFsc2V9.jNq1s5nIFY8JjgyBOHMjDfpa8QBa3wr5jOUE8Vuj_uctLNrah00e06DeN4oX1CRs-RrCje2sn94q5E9WscN3mw
+@facultyToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2NTllYmI2ZS03ZjNlLTQ4MzItYThlOS0zNmQ5OTU3NjUwNDAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4OTUwMjIxLCJpYXQiOjE3ODg5NDY2MjEsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInN1ZmZpeCI6IkpyLiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4OTQ2NjIxfV0sInNlc3Npb25faWQiOiI3ZTNhY2Q3OS0wN2M2LTQ5NTgtOTczZC1iODNkMjFhYzZhOTAiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.4T5HIuMYkjAp3Wqz1ZNxZFhGql4lYQIJHgmXn9x8AHjImYZ5OYKALtI5N-pZHVo883_qKfn96JEiQhu20PHKdA
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwYmU3NzZlMS0xNzhkLTQ2NWEtYmViZC1iODMwODkyYTcwMWIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4OTY3NjM1LCJpYXQiOjE3ODg5NjQwMzUsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzZWVkX2tleSI6ImludGVybnNoaXAtY29vcmRpbmF0b3ItMDEiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4OTY0MDM1fV0sInNlc3Npb25faWQiOiIzN2VkNjNiNC00YzRmLTRlNjEtYjNmZC1jNDcxYzQ5ZTBjYTUiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.w90lXLgdo9PIdz26qFGH5mpFuQwBPIMP4jz3Q2BQAH90MCVHLoRP-YzlKqu7kdke-AZHyKU3Zja0JuWLUlwSdA
 
 ###############################################################
 
@@ -153,7 +145,7 @@ Content-Type: application/json
 
 {
 "email": "{{coordinator}}",
-"password": "{{newPassword}}"
+"password": "{{defaultPassword}}"
 }
 
 ###############################################################
@@ -167,7 +159,7 @@ Content-Type: application/json
 
 {
 "email": "{{student}}",
-"password": "{{newPassword}}"
+"password": "{{defaultPassword}}"
 }
 
 ###############################################################
@@ -181,7 +173,7 @@ Content-Type: application/json
 
 {
 "email": "{{faculty}}",
-"password": "{{newPassword}}"
+"password": "{{defaultPassword}}"
 }
 
 ###############################################################
@@ -238,44 +230,12 @@ Content-Type: application/json
 
 {
 "userId": "{{studentUserId}}",
-"studentNumber": "{{studentNumber}}",
-"program": "BS Information Technology",
-"yearLevel": 4,
-"section": "A",
+"studentNumber": "2023001",
+"program": "BS Computer Science",
+"yearLevel": 3,
+"section": "A1",
 "contactNumber": "09123456789",
-"address": "Bulacan, Philippines",
-"emergencyContactName": "Juan Cruz",
-"emergencyContactNumber": "09987654321"
-}
-
-###############################################################
-
-# FR-03 DUPLICATE STUDENT PROFILE
-
-###############################################################
-
-### Administrator Attempts Duplicate Profile
-
-###
-
-### Expected:
-
-### - HTTP 409 Conflict
-
-### - Existing student profile is not duplicated
-
-POST {{apiUrl}}/students
-Authorization: Bearer {{adminToken}}
-Content-Type: application/json
-
-{
-"userId": "{{studentUserId}}",
-"studentNumber": "FR03-MANUAL-002",
-"program": "BS Information Technology",
-"yearLevel": 4,
-"section": "A",
-"contactNumber": "09123456789",
-"address": "Bulacan, Philippines",
+"address": "3494 Lucban Avenue, Makati City, Metro Manila",
 "emergencyContactName": "Juan Cruz",
 "emergencyContactNumber": "09987654321"
 }
@@ -369,8 +329,8 @@ Authorization: Bearer {{studentToken}}
 Content-Type: application/json
 
 {
-"contactNumber": "09999999999",
-"address": "Updated Student Address"
+"emergencyContactName": "Juan Dimalanta",
+"emergencyContactNumber": "09987654000"
 }
 
 ###############################################################

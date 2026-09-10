@@ -35,11 +35,9 @@
 @admin=adminsbims1@grr.la
 @student=studentsbims1@grr.la
 @faculty=facultysbims1@grr.la
-
-@coordinator=coordinatorsbims1@grr.la
-
+@coordinator=coordinatorsbims2@grr.la
+@hte=htesbims1@grr.la
 @defaultPassword=Dev2026!
-
 @newPassword=deV2026!
 
 
@@ -51,11 +49,10 @@
 
 # Replace after login
 
-@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNDQ0MDI3Ny1kMGQ0LTQwYWEtYTkyZS04MGRhNDNjYTllNmMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODkxNjMyLCJpYXQiOjE3ODg4ODgwMzIsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4ODg4ODAzMn1dLCJzZXNzaW9uX2lkIjoiNTEwZDhmMGYtZDNkZC00MTY4LWE2M2YtNmU0ODk5MmI1OTRiIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.-1Z4POM6no4JzQTUZcqWUajDEbo3EhLuFYqiX-Xk-jvBiUutlSRDUnPw4DL-tgMRVDrgFAzgTyyl7NpZ-KHlLw
+@adminToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIyNDQ0MDI3Ny1kMGQ0LTQwYWEtYTkyZS04MGRhNDNjYTllNmMiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODk2OTA2LCJpYXQiOjE3ODg4OTMzMDYsImVtYWlsIjoiYWRtaW5zYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IklzYWFjIiwibGFzdF9uYW1lIjoiQ2xhcmtlIiwibWlkZGxlX25hbWUiOiJNYXJhZG9uYSIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3VmZml4IjpudWxsfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4ODg5MzMwNn1dLCJzZXNzaW9uX2lkIjoiMmNiMWE0ZTctYTQ2My00OTlmLWJlOWQtOTBmMjIzOGNjOWQ0IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.nti_Af3MVqXiDXK3PW9S8wlbJySBPStnhuCeyIk0kynQtGXnYA6NqlFkt40VHxc2Eyh_fx-Zn-hNXs1tAxb8Aw
 @studentToken=PASTE_STUDENT_ACCESS_TOKEN
-
-@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODg1MjExLCJpYXQiOjE3ODg4ODE2MTEsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4ODgxNjExfV0sInNlc3Npb25faWQiOiI2MGNlOTAzNC1iM2FkLTQxNzYtOGM1OS1lODk0Nzc2MDlhNTciLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.gk1pSgGH2_pN59PiThiGTDmrPlgQWy2oCEtEqWLjsGej2YEAW3FgaDFkcOIsAEfjkkbGDDWWWobQnksJwsRKgg
-
+@coordinatorToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJmMzg1NzM1OC1kZjFmLTRiNzEtOTU4MC01YmQzZmI0MTQ3ZGIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4OTQ3MDM5LCJpYXQiOjE3ODg5NDM0MzksImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4OTQzNDM5fV0sInNlc3Npb25faWQiOiIzNTBkNGRiMS0zNTA5LTQ4NWEtYmNiYS0wZmIyMGQ1ZGI0NWQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.GJ493dyWNn3ltYD2EJclrnw_ATHL1KmNhrkWVdBYsbgFEK40f7sFoyVLnbTTAzh5eBCaRtWf5WHUlc-LEuSYUg
+@hteToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkYzFlNmY1NC1hMmEzLTRhY2YtYmU0MC0yMDA3YjQ2YzJmZWUiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4ODk2NDUzLCJpYXQiOjE3ODg4OTI4NTMsImVtYWlsIjoiaHRlc2JpbXMxQGdyci5sYSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJSb2JlcnRvIEx1aXMiLCJsYXN0X25hbWUiOiJWYWxkZXJhbWEiLCJtaWRkbGVfbmFtZSI6IkZlcm5hbmRleiIsInJvbGUiOiJodGVfc3VwZXJ2aXNvciIsInN1ZmZpeCI6bnVsbH0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3ODg4OTI4NTN9XSwic2Vzc2lvbl9pZCI6ImM0MzNiYjE5LWVhZDQtNDM5OC1hZWYzLTZmZDJjNjIzZjYxYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.QUlerJya4EhXLWNnV3XOiuQHqRWynp5-3khgbEqJAsiapMja_7hplnkoEYBeqFutMHfGlfbhARveEQwxO1fpaA
 ###############################################################
 
 # USER IDS
@@ -64,7 +61,7 @@
 
 # Replace after creating user
 
-@userId=24440277-d0d4-40aa-a92e-80da43ca9e6c
+@userId=0afd9f69-0991-4d14-a0e9-6446b0109e83
 
 
 
@@ -85,7 +82,7 @@ Content-Type: application/json
 
 {
   "email": "{{admin}}",
-  "password": "{{newPassword}}"
+  "password": "{{defaultPassword}}"
 }
 
 ####
@@ -96,6 +93,16 @@ Content-Type: application/json
   "email": "{{coordinator}}",
   "password": "{{newPassword}}"
 }
+
+###
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{faculty}}",
+  "password": "{{defaultPassword}}"
+}
+
 
 
 
@@ -115,7 +122,7 @@ Content-Type: application/json
 ### - Returns user list
 
 GET {{apiUrl}}/users
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{coordinatorToken}}
 
 
 
@@ -134,7 +141,7 @@ Authorization: Bearer {{adminToken}}
 ### - Returns profile information
 
 GET {{apiUrl}}/users/{{userId}}
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{coordinatorToken}}
 
 
 
@@ -204,7 +211,7 @@ Content-Type: application/json
 ### - Updated values returned
 
 GET {{apiUrl}}/users/{{userId}}
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{coordinatorToken}}
 
 
 
@@ -399,3 +406,19 @@ Content-Type: application/json
 
 GET {{apiUrl}}/users
 
+###############################################################
+
+# Fetch Users by Role (Administrator & Coordinator)
+# 
+
+###############################################################
+
+GET {{apiUrl}}/users/role/hte_supervisor
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json
+
+###############################################################
+
+GET {{apiUrl}}/users/role/faculty_adviser
+Authorization: Bearer {{coordinatorToken}}
+Content-Type: application/json

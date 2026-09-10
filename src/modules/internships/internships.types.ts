@@ -8,14 +8,7 @@ export interface CreateInternshipRequest {
 
 export interface UpdateInternshipRequest {
   hteId?: string;
-
   requiredHours?: number | null;
-
-  position?: string;
-
-  startDate?: string;
-
-  endDate?: string;
 }
 
 export interface ReviewInternshipRequest {

@@ -78,10 +78,10 @@
 
 ###############################################################
 @apiUrl=http://localhost:8000/api/v1
-@internshipId=5d21d1c0-65e5-4fc5-93e4-4191c5d0ee5f
-@studentId=bcfb4652-2a62-4383-a986-33e838ed3631
-@hteId=38253f4d-41d8-4cb5-a658-6d012f1ce60e
-@facultyAdviserId=cd315baa-c628-4ff9-9f71-9caae86ed096
+@internshipId=4f735a35-d0d2-406a-b1a5-92fa0fcdf312
+@studentId=0afd9f69-0991-4d14-a0e9-6446b0109e83
+@hteId=ac92d255-8654-48bc-b1fa-48f976022029
+@facultyAdviserId=659ebb6e-7f3e-4832-a8e9-36d995765040
 
 ###############################################################
 
@@ -114,10 +114,9 @@
 ### Paste a valid administrator access token here.
 
 @adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIwMTUwMWQzMS1hNThiLTQwMzQtOGI1Yy1iMGI2ZjllY2UzNzgiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4Njc1OTYyLCJpYXQiOjE3ODg2NzIzNjIsImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4NjcyMzYyfV0sInNlc3Npb25faWQiOiI2MGYwNDIyNC0wNGMyLTQ2ZTQtYmM3Yy02ZGE5YWFiNGY2NWEiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.esJi4RNYoL10X3NvD4rKDBq5klIjhetzmSgYKZzr0OUFHbLYv351cL0lHTXRH8mP8TxXv5zLAOtANP_Blrfg0A
+@coordinatorAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJmMzg1NzM1OC1kZjFmLTRiNzEtOTU4MC01YmQzZmI0MTQ3ZGIiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4OTQ5NDk5LCJpYXQiOjE3ODg5NDU4OTksImVtYWlsIjoiY29vcmRpbmF0b3JzYmltczFAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6IkVsaXNlIiwibGFzdF9uYW1lIjoiUXVpamFubyIsIm1pZGRsZV9uYW1lIjoiTWFuYW5zYWxhIiwicm9sZSI6ImludGVybnNoaXBfY29vcmRpbmF0b3IiLCJzdWZmaXgiOm51bGx9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4OTQ1ODk5fV0sInNlc3Npb25faWQiOiI4YjVhZTE1Zi04NGE0LTQyZmMtOWU5OC0xN2NkZDU2ZTE2OGQiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.UJSGcp5Als8DQN6-6r4MSsLWNrDjuJQKQGiUEeUYfJZbtambzo9Dl6LnUwD8Im1ETt4tsZ-mtWImTizp48RuOQ
+@facultyAccessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI2NTllYmI2ZS03ZjNlLTQ4MzItYThlOS0zNmQ5OTU3NjUwNDAiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg4OTM1MzcxLCJpYXQiOjE3ODg5MzE3NzEsImVtYWlsIjoiZmFjdWx0eXNiaW1zMUBncnIubGEiLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJmaXJzdF9uYW1lIjoiTmF0aGFuaWVsIEFuZHJlcyIsImxhc3RfbmFtZSI6Ik5hY3BpbCIsIm1pZGRsZV9uYW1lIjoiU2FybWllbnRvIiwicm9sZSI6ImZhY3VsdHlfYWR2aXNlciIsInN1ZmZpeCI6IkpyLiJ9LCJyb2xlIjoiYXV0aGVudGljYXRlZCIsImFhbCI6ImFhbDEiLCJhbXIiOlt7Im1ldGhvZCI6InBhc3N3b3JkIiwidGltZXN0YW1wIjoxNzg4OTMxNzcxfV0sInNlc3Npb25faWQiOiIxZTY0MDYwYS05NDA0LTQ0Y2MtYWE2YS1hMzEwN2JhMzgzYzYiLCJpc19hbm9ueW1vdXMiOmZhbHNlfQ.-y-SubtzT9kr00oLkDBJI0ySOOSo7Wzok0m0ll2FELkitDe7l0yNLdDL2phHrIbEmWgLabk8lazcPsISDveQbg
 @studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
-@facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
-
 ###############################################################
 
 # HEALTH
@@ -179,7 +178,7 @@ Content-Type: application/json
 
 {
 "email": "{{coordinator}}",
-"password": "{{newPassword}}"
+"password": "{{defaultPassword}}"
 }
 
 ###
@@ -467,7 +466,7 @@ Content-Type: application/json
 ### FR-05 - Completed Internship Cannot Transition Again
 
 PATCH {{apiUrl}}/internships/{{internshipId}}/status
-Authorization: Bearer {{adminAccessToken}}
+Authorization: Bearer {{coordinatorAccessToken}}
 Content-Type: application/json
 
 {

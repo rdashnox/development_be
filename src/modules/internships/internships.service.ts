@@ -78,6 +78,7 @@ export class InternshipService {
       .from("internships")
       .select(INTERNSHIP_SELECT)
       .eq("student_id", studentId)
+      .in("status", ["pending", "active"])
       .maybeSingle();
 
     if (error) {
@@ -146,6 +147,7 @@ export class InternshipService {
       .from("internships")
       .select("id")
       .eq("student_id", request.studentId)
+      .in("status", ["pending", "active"])
       .maybeSingle();
 
     if (existingError) {
@@ -158,7 +160,7 @@ export class InternshipService {
     if (existingInternship) {
       throw new AppError(
         409,
-        "The student already has an internship assignment.",
+        "The student already has an active or pending internship assignment.",
       );
     }
 
