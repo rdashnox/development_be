@@ -9,14 +9,14 @@
     "cf:deploy": "wrangler deploy"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.4.3",
-    "@supabase/supabase-js": "^2.49.0",
-    "@upstash/redis": "^1.38.2",
-    "hono": "^4.12.32",
-    "hono-rate-limiter": "^0.5.3",
-    "zod": "^3.25.0"
+    "@hono/zod-validator": "^0.9.1",
+    "@supabase/supabase-js": "^2.116.0",
+    "@upstash/redis": "^1.38.4",
+    "hono": "^4.13.7",
+    "hono-rate-limiter": "^0.5.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
-    "wrangler": "^4.123.0"
+    "wrangler": "^4.130.0"
   }
 }

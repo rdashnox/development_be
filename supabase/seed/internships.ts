@@ -1,5 +1,3 @@
-// supabase/seed/internships.ts
-
 import { createSeedAdminClient, normalizeEmail, seedError } from "./_shared/seed-utils.ts";
 
 const supabaseAdmin = createSeedAdminClient();

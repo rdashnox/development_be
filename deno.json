@@ -4,13 +4,13 @@
   "imports": {
     "@std/assert": "jsr:@std/assert@^1.0.19",
     "@std/testing": "jsr:@std/testing@^1.0.20",
-    "@upstash/redis": "npm:@upstash/redis@^1.38.2",
-    "hono": "npm:hono@^4.12.32",
-    "@hono/zod-validator": "npm:@hono/zod-validator@^0.4.3",
-    "zod": "npm:zod@^3.25.0",
-    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.49.0",
-    "@std/testing/mock": "jsr:@std/testing@^1.0.0/mock",
-    "hono-rate-limiter": "npm:hono-rate-limiter@^0.5.3"
+    "@upstash/redis": "npm:@upstash/redis@^1.38.4",
+    "hono": "npm:hono@^4.13.7",
+    "@hono/zod-validator": "npm:@hono/zod-validator@^0.9.1",
+    "zod": "npm:zod@^3.25.76",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.116.0",
+    "@std/testing/mock": "jsr:@std/testing@^1.0.20/mock",
+    "hono-rate-limiter": "npm:hono-rate-limiter@^0.5.4"
   },
   "tasks": {
     "dev": "deno serve --watch --env-file=.env --allow-env --allow-read --allow-net src/main.ts",
@@ -20,10 +20,10 @@
     "seed:internships": "deno run --env-file=.env --allow-env --allow-net --allow-read supabase/seed/internships.ts",
     "fmt": "deno fmt",
     "lint": "deno lint",
-    "verify": "deno fmt --check && deno lint && deno check src/main.ts",
+    "verify": "deno fmt --check && deno lint && deno task check",
     "refresh": "deno cache --reload src/main.ts",
     "lock:update": "deno install --frozen=false",
-    "check": "deno check src supabase",
+    "check": "deno check src supabase tests",
     "test": "deno task test:unit && deno task test:integration",
     "test:coverage": "deno test --env-file=.env.test tests --coverage=coverage --allow-env --allow-net --allow-read && deno coverage coverage",
     "test:unit": "deno test --env-file=.env.test tests/unit --allow-read --allow-env --allow-net",
@@ -35,6 +35,7 @@
     "test:unit:attendance": "deno test --env-file=.env.test tests/unit/attendance/attendance.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:evaluations": "deno test --env-file=.env.test tests/unit/evaluations/evaluations.service.test.ts --allow-read --allow-env --allow-net",
     "test:unit:documents": "deno test --env-file=.env.test tests/unit/documents/documents.service.test.ts --allow-read --allow-env --allow-net",
+    "test:unit:reports": "deno test --env-file=.env.test tests/unit/reports/reports.test.ts --allow-read --allow-env --allow-net",
     "test:unit:infrastructure:rate-limit": "deno test --env-file=.env.test tests/unit/infrastructure/noop-rate-limit.store.test.ts --allow-read --allow-env --allow-net",
     "test:unit:middleware:rate-limit": "deno test --env-file=.env.test tests/unit/middleware/rate-limit.middleware.test.ts --allow-read --allow-env --allow-net",
     "test:smoke:upstash": "deno test --env-file=.env tests/smoke/upstash-redis.smoke.test.ts --allow-read --allow-env --allow-net",
@@ -47,6 +48,7 @@
     "test:integration:attendance": "deno test --env-file=.env.test tests/integration/attendance.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:evaluations": "deno test --env-file=.env.test tests/integration/evaluations.integration.test.ts --allow-read --allow-env --allow-net",
     "test:integration:documents": "deno test --env-file=.env.test tests/integration/documents.integration.test.ts --allow-read --allow-env --allow-net",
+    "test:integration:reports": "deno test --env-file=.env.test tests/integration/reports.integration.test.ts --allow-read --allow-env --allow-net",
     "bootstrap-admin": "deno run --env-file=.env.prod --allow-env --allow-net --allow-read supabase/bootstrap/create-admin.ts"
   },
   "fmt": {

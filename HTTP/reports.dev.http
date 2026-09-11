@@ -1,0 +1,194 @@
+###############################################################
+# Reporting Module (FR-10) 
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+###############################################################
+# Seed Users & Test Credentials
+###############################################################
+
+@admin=adminsbims1@grr.la
+@student=studentsbims1@grr.la
+@faculty=facultysbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
+@defaultPassword=Dev2026!
+
+# Placeholder UUIDs for dynamic relation filtering tests
+@sampleHteUuid=00000000-0000-0000-0000-000000000001
+@sampleFacultyUuid=00000000-0000-0000-0000-000000000002
+@sampleStudentUuid=00000000-0000-0000-0000-000000000003
+
+###############################################################
+# Tokens (Populate dynamically via login requests below)
+###############################################################
+
+@adminToken=PASTE_YOUR_ADMIN_TOKEN_HERE
+@studentToken=PASTE_YOUR_STUDENT_TOKEN_HERE
+@facultyToken=PASTE_YOUR_FACULTY_TOKEN_HERE
+@coordinatorToken=PASTE_YOUR_COORDINATOR_TOKEN_HERE
+
+###############################################################
+# AUTHENTICATION & TOKEN ACQUISITION
+###############################################################
+
+# @name loginCoordinator
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{coordinator}}",
+  "password": "{{defaultPassword}}"
+}
+
+###
+
+# @name loginAdmin
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{admin}}",
+  "password": "{{defaultPassword}}"
+}
+
+###
+
+# @name loginStudent
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{student}}",
+  "password": "{{defaultPassword}}"
+}
+
+###############################################################
+# CORE REPORTS ENDPOINTS - ADMINISTRATOR ACCESS
+###############################################################
+
+# 1. Fetch all internship records with pagination defaults
+GET {{apiUrl}}/reports/internships
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 2. Fetch global internship summary statistics
+GET {{apiUrl}}/reports/internships/summary
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 3. Filter reports by status (active)
+GET {{apiUrl}}/reports/internships?status=active
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 4. Filter reports by status (completed)
+GET {{apiUrl}}/reports/internships?status=completed
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 5. Filter reports by academic program (BSIT)
+GET {{apiUrl}}/reports/internships?program=BSIT
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 6. Filter reports by academic program (BSCS)
+GET {{apiUrl}}/reports/internships?program=BSCS
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 7. Filter reports by Host Training Establishment (HTE) UUID
+GET {{apiUrl}}/reports/internships?hte_id={{sampleHteUuid}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 8. Filter reports by Faculty Adviser UUID
+GET {{apiUrl}}/reports/internships?faculty_adviser_id={{sampleFacultyUuid}}
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 9. Combined Filters: Status + Program
+GET {{apiUrl}}/reports/internships?status=active&program=BSIT
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 10. Combined Filters: Program + HTE ID + Limit/Offset Pagination
+GET {{apiUrl}}/reports/internships?program=BSIT&hte_id={{sampleHteUuid}}&limit=5&offset=0
+Authorization: Bearer {{adminToken}}
+
+###############################################################
+# ROLE-BASED ACCESS CONTROL (RBAC) & SECURITY TESTS
+###############################################################
+
+# 11. Coordinator access to general internship reports (Should succeed)
+GET {{apiUrl}}/reports/internships
+Authorization: Bearer {{coordinatorToken}}
+
+###
+
+# 12. Coordinator access to summary statistics (Should succeed)
+GET {{apiUrl}}/reports/internships/summary
+Authorization: Bearer {{coordinatorToken}}
+
+###
+
+# 13. Student role attempting to access full reports (Should return 403 Forbidden)
+GET {{apiUrl}}/reports/internships
+Authorization: Bearer {{studentToken}}
+
+###
+
+# 14. Student role attempting to access report summaries (Should return 403 Forbidden)
+GET {{apiUrl}}/reports/internships/summary
+Authorization: Bearer {{studentToken}}
+
+###
+
+# 15. Unauthenticated request without Authorization header (Should return 401 Unauthorized)
+GET {{apiUrl}}/reports/internships
+
+###
+
+# 16. Request with malformed Bearer token structure (Should return 401 Unauthorized)
+GET {{apiUrl}}/reports/internships
+Authorization: Bearer invalid_token_format_string
+
+###############################################################
+# INPUT VALIDATION & ERROR HANDLING TESTS
+###############################################################
+
+# 17. Invalid status enum filter value validation (Should return 400 Bad Request / Zod Error)
+GET {{apiUrl}}/reports/internships?status=suspended_indefinitely
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 18. Invalid pagination limit parameter type (Negative integer or non-numeric)
+GET {{apiUrl}}/reports/internships?limit=-10
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 19. Malformed UUID format check for HTE filter
+GET {{apiUrl}}/reports/internships?hte_id=not-a-valid-uuid-string
+Authorization: Bearer {{adminToken}}
+
+###
+
+# 20. Unsupported HTTP method verification on reports endpoint (Should return 404 or 405)
+POST {{apiUrl}}/reports/internships
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "active"
+}

@@ -12,6 +12,7 @@ import internships from "../modules/internships/internships.routes.ts";
 import attendance from "../modules/attendance/attendance.routes.ts";
 import evaluations from "../modules/evaluations/evaluations.routes.ts";
 import documents from "../modules/documents/documents.routes.ts";
+import reports from "../modules/reports/reports.routes.ts";
 
 import { performanceRoutes } from "../modules/performance/performance.routes.ts";
 
@@ -36,6 +37,7 @@ export function createApiRoutes(
   api.route("/attendance", attendance);
   api.route("/evaluations", evaluations);
   api.route("/documents", documents);
+  api.route("/reports", reports);
 
   api.route("/performance", performanceRoutes);
 

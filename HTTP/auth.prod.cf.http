@@ -26,7 +26,7 @@
 @apiUrl=https://sbims.lr-aimperial.workers.dev/api/v1
 
 ### Access token from a successful login
-@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJkNjBjZTlhMC0yZDg1LTRlMWYtOGY4OC1lZjM2MDhjMThiYzYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg1OTQyNTQxLCJpYXQiOjE3ODU5Mzg5NDEsImVtYWlsIjoic3R1ZGVudHNiaW1zMUBtYWlsZHJvcC5jYyIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWxfdmVyaWZpZWQiOnRydWUsImZpcnN0X25hbWUiOiJSYWZhZWwgSm9hcXVpbiIsImxhc3RfbmFtZSI6IkRpbWFsYW50YSIsIm1pZGRsZV9uYW1lIjoiQm9uZG9jIiwicm9sZSI6InN0dWRlbnQiLCJzdWZmaXgiOiJJSUkifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4NTkzODk0MX1dLCJzZXNzaW9uX2lkIjoiNWEzYzk1ZWYtMzQ4ZS00MTRhLTk0YjMtODNlZTcxZTg1NmZkIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.bY2ds4crK0GD73HrzBUErZqrWmIiSL8TOrfvf1Uzv1V50DcLhPZ4CJcJMPl4LUbavVTcVIklZxk_bf0oiEIfBw
+@accessToken=PASTE_ACCESS_TOKEN_HERE
 ###############################################################
 # Seed Users
 ###############################################################
