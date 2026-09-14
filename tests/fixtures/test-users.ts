@@ -39,6 +39,22 @@ export const TEST_USERS = {
     role: "hte_supervisor",
   },
 
+  facultyAdviser: {
+    email: "sbims-test-faculty-adviser@maildrop.cc",
+    password: "TestPassword2026!",
+    firstName: "Test",
+    lastName: "Faculty Adviser",
+    role: "faculty_adviser",
+  },
+
+  otherFacultyAdviser: {
+    email: "sbims-test-faculty-adviser-2@maildrop.cc",
+    password: "TestPassword2026!",
+    firstName: "Test",
+    lastName: "Other Faculty Adviser",
+    role: "faculty_adviser",
+  },
+
   firstLogin: {
     email: "sbims-test-first-login@maildrop.cc",
     password: "TestPassword2026!",

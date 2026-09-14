@@ -42,29 +42,17 @@
 ###############################################################
 
 @apiUrl=http://localhost:8000/api/v1
-
-### HTE ID
-### Replace after creating an HTE.
-@hteId=ead13b5c-4d43-44b8-953f-227ff180ba64
-### HTE Supervisor User ID
-### Replace with the ID of a profile whose role is hte_supervisor.
+@hteId=748e8f09-68c5-462d-8e21-d13e7784eeae
 @hteSupervisorUserId=2300ead7-6b42-4d29-a07d-cd91c4b4b4e8
-
-### Student User ID
-### Replace with a student assigned to the HTE for testing.
 @studentUserId=bcfb4652-2a62-4383-a986-33e838ed3631
-
-
 ###############################################################
 # SEED USERS
 ###############################################################
-
 @admin=adminsbims1@grr.la
 @coordinator=coordinatorsbims1@grr.la
 @faculty=facultysbims1@grr.la
 @student=studentsbims1@grr.la
 @hte=htesbims3@grr.la
-
 
 ###############################################################
 # PASSWORDS
@@ -78,7 +66,7 @@
 # ACCESS TOKENS
 ###############################################################
 @adminToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+@coordinatorToken=
 @hteSupervisorToken=PASTE_HTE_SUPERVISOR_ACCESS_TOKEN_HERE
 @facultyToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 @studentToken=PASTE_STUDENT_ACCESS_TOKEN_HERE

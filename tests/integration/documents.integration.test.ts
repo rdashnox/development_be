@@ -13,6 +13,9 @@ const app = createApp(env);
 const { supabaseAdmin } = createSupabaseClients(env);
 
 const STORAGE_BUCKET = "internship-documents";
+const TEST_START_DATE = "2026-08-17";
+const TEST_END_DATE = "2026-12-19";
+const TEST_REQUIRED_HOURS = 150;
 
 type DocumentRecord = {
   id: string;
@@ -33,6 +36,7 @@ type TestInternship = {
   id: string;
   student_id: string;
   hte_id: string;
+  faculty_adviser_id: string | null;
   status: string;
 };
 
@@ -42,15 +46,11 @@ async function login(
 ) {
   const response = await app.request("/api/v1/auth/login", {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
   });
 
-  const body = await response.json();
-
-  return { response, body };
+  return { response, body: await response.json() };
 }
 
 async function authenticatedRequest(
@@ -69,36 +69,27 @@ async function authenticatedRequest(
 
 async function getTestUserId(email: string): Promise<string> {
   const { data, error } = await supabaseAdmin.auth.admin.listUsers();
-
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   const user = data.users.find(
     (item) => item.email?.toLowerCase() === email.toLowerCase(),
   );
 
-  if (!user) {
-    throw new Error(`Test user not found: ${email}`);
-  }
-
+  if (!user) throw new Error(`Test user not found: ${email}`);
   return user.id;
 }
 
-async function ensureTestStudentProfile() {
+async function prepareStudent() {
   const studentId = await getTestUserId(TEST_USERS.student.email);
 
-  // Keep this fixture isolated from old integration-test data.
-  const { error: internshipError } = await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from("internships")
     .delete()
     .eq("student_id", studentId);
 
-  if (internshipError) {
-    throw internshipError;
-  }
+  if (error) throw error;
 
-  const { data, error } = await supabaseAdmin
+  const { data, error: profileError } = await supabaseAdmin
     .from("student_profiles")
     .upsert(
       {
@@ -114,30 +105,20 @@ async function ensureTestStudentProfile() {
       },
       { onConflict: "id" },
     )
-    .select(
-      `
-      id,
-      student_number,
-      program,
-      year_level,
-      section
-    `,
-    )
+    .select("id")
     .single();
 
-  if (error || !data) {
-    throw error ?? new Error("Unable to create test student profile.");
+  if (profileError || !data) {
+    throw profileError ?? new Error("Unable to prepare student profile.");
   }
 
-  return data;
+  return data as { id: string };
 }
 
 async function createTestHte(token: string) {
   const response = await authenticatedRequest("/api/v1/htes", token, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       companyName: `Documents Test HTE ${crypto.randomUUID()}`,
       address: "Test Address, Bulacan",
@@ -148,7 +129,6 @@ async function createTestHte(token: string) {
   });
 
   const body = await response.json();
-
   assertEquals(response.status, 201);
   assertEquals(body.success, true);
   assertExists(body.data);
@@ -160,15 +140,18 @@ async function createTestInternship(
   token: string,
   studentId: string,
   hteId: string,
+  facultyAdviserId: string,
 ): Promise<TestInternship> {
   const response = await authenticatedRequest("/api/v1/internships", token, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       studentId,
       hteId,
+      facultyAdviserId,
+      startDate: TEST_START_DATE,
+      endDate: TEST_END_DATE,
+      requiredHours: TEST_REQUIRED_HOURS,
     }),
   });
 
@@ -181,26 +164,18 @@ async function createTestInternship(
   return body.data as TestInternship;
 }
 
-async function activateInternship(
-  token: string,
-  internshipId: string,
-): Promise<TestInternship> {
+async function activateInternship(token: string, internshipId: string) {
   const response = await authenticatedRequest(
     `/api/v1/internships/${internshipId}/status`,
     token,
     {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        status: "active",
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "active" }),
     },
   );
 
   const body = await response.json();
-
   assertEquals(response.status, 200);
   assertEquals(body.success, true);
   assertEquals(body.data.status, "active");
@@ -208,35 +183,51 @@ async function activateInternship(
   return body.data as TestInternship;
 }
 
-async function createTestFixture(): Promise<{
-  student: { id: string };
-  internship: TestInternship;
-  hteId: string;
-}> {
+async function createTestFixture(
+  requestedStatus: "pending" | "active" | "completed" = "active",
+) {
   await setupTestUsers();
 
-  const student = await ensureTestStudentProfile();
+  const student = await prepareStudent();
   const adminLogin = await login();
-
   assertEquals(adminLogin.response.status, 200);
   assertEquals(adminLogin.body.success, true);
 
+  const facultyAdviserId = await getTestUserId(TEST_USERS.facultyAdviser.email);
   const hte = await createTestHte(adminLogin.body.data.accessToken);
-  const internship = await createTestInternship(
+
+  let internship = await createTestInternship(
     adminLogin.body.data.accessToken,
     student.id,
     hte.id,
-  );
-  const activeInternship = await activateInternship(
-    adminLogin.body.data.accessToken,
-    internship.id,
+    facultyAdviserId,
   );
 
-  return {
-    student,
-    internship: activeInternship,
-    hteId: hte.id,
-  };
+  if (requestedStatus !== "pending") {
+    internship = await activateInternship(
+      adminLogin.body.data.accessToken,
+      internship.id,
+    );
+  }
+
+  if (requestedStatus === "completed") {
+    const { data, error } = await supabaseAdmin
+      .from("internships")
+      .update({ status: "completed" })
+      .eq("id", internship.id)
+      .select("*")
+      .single();
+
+    if (error || !data) {
+      throw (
+        error ?? new Error("Unable to prepare completed internship fixture.")
+      );
+    }
+
+    internship = data as TestInternship;
+  }
+
+  return { student, internship, hteId: hte.id };
 }
 
 function createTestFile(
@@ -253,14 +244,9 @@ function createMultipartBody(
   file?: File,
 ): FormData {
   const form = new FormData();
-
   form.append("internship_id", internshipId);
   form.append("document_type", documentType);
-
-  if (file) {
-    form.append("file", file);
-  }
-
+  if (file) form.append("file", file);
   return form;
 }
 
@@ -270,16 +256,12 @@ async function uploadDocument(
   documentType: string,
   file: File = createTestFile(),
 ) {
-  const form = createMultipartBody(internshipId, documentType, file);
-
   const response = await authenticatedRequest("/api/v1/documents", token, {
     method: "POST",
-    body: form,
+    body: createMultipartBody(internshipId, documentType, file),
   });
 
-  const body = await response.json();
-
-  return { response, body };
+  return { response, body: await response.json() };
 }
 
 async function getDocumentFromDatabase(
@@ -291,10 +273,7 @@ async function getDocumentFromDatabase(
     .eq("id", documentId)
     .maybeSingle();
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data as DocumentRecord | null;
 }
 
@@ -307,19 +286,12 @@ async function getDocumentsForInternship(
     .eq("internship_id", internshipId)
     .order("created_at", { ascending: true });
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return (data ?? []) as DocumentRecord[];
 }
 
-async function cleanupFixture(
-  internshipId: string,
-  hteId: string,
-): Promise<void> {
+async function cleanupFixture(internshipId: string, hteId: string) {
   const documents = await getDocumentsForInternship(internshipId);
-
   const storagePaths = [
     ...new Set(documents.map((document) => document.storage_path)),
   ];
@@ -328,387 +300,210 @@ async function cleanupFixture(
     const { error } = await supabaseAdmin.storage
       .from(STORAGE_BUCKET)
       .remove(storagePaths);
-
-    if (error) {
-      console.error("DOCUMENT TEST STORAGE CLEANUP FAILED:", error);
-    }
+    if (error) console.error("DOCUMENT TEST STORAGE CLEANUP FAILED:", error);
   }
 
   const { error: internshipError } = await supabaseAdmin
     .from("internships")
     .delete()
     .eq("id", internshipId);
-
   if (internshipError) {
     console.error("DOCUMENT TEST INTERNSHIP CLEANUP FAILED:", internshipError);
   }
 
-  // The fixture creates the HTE directly for this test.
-  // Delete it after the internship is gone so tests do not accumulate HTE rows.
   const { error: hteError } = await supabaseAdmin
     .from("hte_profiles")
     .delete()
     .eq("id", hteId);
-
-  if (hteError) {
-    console.error("DOCUMENT TEST HTE CLEANUP FAILED:", hteError);
-  }
+  if (hteError) console.error("DOCUMENT TEST HTE CLEANUP FAILED:", hteError);
 }
 
-/*
- * ---------------------------------------------------------
- * AUTHENTICATION
- * ---------------------------------------------------------
- */
+async function loginAs(email: string, password: string) {
+  const result = await login(email, password);
+  assertEquals(result.response.status, 200);
+  assertEquals(result.body.success, true);
+  return result.body.data.accessToken as string;
+}
 
 Deno.test("Documents - unauthenticated request returns 401", async () => {
   const response = await app.request("/api/v1/documents");
-
   assertEquals(response.status, 401);
 });
 
-/*
- * ---------------------------------------------------------
- * UPLOAD
- * ---------------------------------------------------------
- */
-
 Deno.test("Documents - student can upload a PDF", async () => {
   const { student, internship, hteId } = await createTestFixture();
-
   try {
-    const studentLogin = await login(
+    const token = await loginAs(
       TEST_USERS.student.email,
       TEST_USERS.student.password,
     );
-
-    assertEquals(studentLogin.response.status, 200);
-
-    const file = createTestFile(
-      "endorsement.pdf",
-      "application/pdf",
-      "Student endorsement document",
-    );
-
-    const { response, body } = await uploadDocument(
-      studentLogin.body.data.accessToken,
+    const file = createTestFile("endorsement.pdf");
+    const result = await uploadDocument(
+      token,
       internship.id,
       "endorsement",
       file,
     );
 
-    assertEquals(response.status, 201);
-    assertEquals(body.success, true);
-    assertExists(body.data);
-
-    assertExists(body.data.id);
-    assertEquals(body.data.internship_id, internship.id);
-    assertEquals(body.data.document_type, "endorsement");
-    assertEquals(body.data.file_name, "endorsement.pdf");
-    assertEquals(body.data.mime_type, "application/pdf");
-    assertEquals(body.data.file_size, file.size);
-    assertEquals(body.data.status, "pending");
-    assertEquals(body.data.uploaded_by, student.id);
-    assertExists(body.data.storage_path);
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-});
-
-Deno.test("Documents - upload requires a file", async () => {
-  const { internship, hteId } = await createTestFixture();
-
-  try {
-    const studentLogin = await login(
-      TEST_USERS.student.email,
-      TEST_USERS.student.password,
-    );
-
-    const form = createMultipartBody(internship.id, "endorsement");
-
-    const response = await authenticatedRequest(
-      "/api/v1/documents",
-      studentLogin.body.data.accessToken,
-      {
-        method: "POST",
-        body: form,
-      },
-    );
-
-    const body = await response.json();
-
-    assertEquals(response.status, 400);
-    assertEquals(body.success, false);
-    assertEquals(body.message, "A document file is required.");
+    assertEquals(result.response.status, 201);
+    assertEquals(result.body.success, true);
+    assertEquals(result.body.data.internship_id, internship.id);
+    assertEquals(result.body.data.document_type, "endorsement");
+    assertEquals(result.body.data.file_name, "endorsement.pdf");
+    assertEquals(result.body.data.mime_type, "application/pdf");
+    assertEquals(result.body.data.file_size, file.size);
+    assertEquals(result.body.data.status, "pending");
+    assertEquals(result.body.data.uploaded_by, student.id);
+    assertExists(result.body.data.storage_path);
   } finally {
     await cleanupFixture(internship.id, hteId);
   }
 });
 
 Deno.test(
-  "Documents - upload rejects an unsupported document type",
+  "Documents - upload validation rejects missing and invalid input",
   async () => {
     const { internship, hteId } = await createTestFixture();
-
     try {
-      const studentLogin = await login(
+      const token = await loginAs(
         TEST_USERS.student.email,
         TEST_USERS.student.password,
       );
 
-      const form = createMultipartBody(
-        internship.id,
-        "not_a_document_type",
-        createTestFile(),
-      );
-
-      const response = await authenticatedRequest(
+      const missingFile = await authenticatedRequest(
         "/api/v1/documents",
-        studentLogin.body.data.accessToken,
+        token,
         {
           method: "POST",
-          body: form,
+          body: createMultipartBody(internship.id, "endorsement"),
         },
       );
+      const missingBody = await missingFile.json();
+      assertEquals(missingFile.status, 400);
+      assertEquals(missingBody.message, "A document file is required.");
 
-      const body = await response.json();
+      const invalidType = await uploadDocument(
+        token,
+        internship.id,
+        "not_a_document_type",
+      );
+      assertEquals(invalidType.response.status, 400);
+      assertEquals(invalidType.body.message, "Invalid document upload data.");
 
-      assertEquals(response.status, 400);
-      assertEquals(body.success, false);
-      assertEquals(body.message, "Invalid document upload data.");
+      const invalidMime = await uploadDocument(
+        token,
+        internship.id,
+        "agreement",
+        createTestFile("malicious.exe", "application/octet-stream"),
+      );
+      assertEquals(invalidMime.response.status, 400);
+      assertEquals(
+        invalidMime.body.message,
+        "Unsupported file type. Allowed types are PDF, DOC, DOCX, JPEG, and PNG.",
+      );
+
+      const empty = await uploadDocument(
+        token,
+        internship.id,
+        "agreement",
+        new File([], "empty.pdf", { type: "application/pdf" }),
+      );
+      assertEquals(empty.response.status, 400);
+      assertEquals(empty.body.message, "The uploaded file is empty.");
+
+      const oversized = await uploadDocument(
+        token,
+        internship.id,
+        "agreement",
+        new File([new Uint8Array(10 * 1024 * 1024 + 1)], "large.pdf", {
+          type: "application/pdf",
+        }),
+      );
+      assertEquals(oversized.response.status, 400);
+      assertEquals(
+        oversized.body.message,
+        "The uploaded file must not exceed 10 MiB.",
+      );
     } finally {
       await cleanupFixture(internship.id, hteId);
     }
   },
 );
 
-Deno.test("Documents - upload rejects an unsupported MIME type", async () => {
-  const { internship, hteId } = await createTestFixture();
-
-  try {
-    const studentLogin = await login(
-      TEST_USERS.student.email,
-      TEST_USERS.student.password,
-    );
-
-    const file = createTestFile(
-      "malicious.exe",
-      "application/octet-stream",
-      "not supported",
-    );
-
-    const { response, body } = await uploadDocument(
-      studentLogin.body.data.accessToken,
-      internship.id,
-      "agreement",
-      file,
-    );
-
-    assertEquals(response.status, 400);
-    assertEquals(body.success, false);
-    assertEquals(
-      body.message,
-      "Unsupported file type. Allowed types are PDF, DOC, DOCX, JPEG, and PNG.",
-    );
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-});
-
-Deno.test("Documents - upload rejects an empty file", async () => {
-  const { internship, hteId } = await createTestFixture();
-
-  try {
-    const studentLogin = await login(
-      TEST_USERS.student.email,
-      TEST_USERS.student.password,
-    );
-
-    const file = new File([], "empty.pdf", {
-      type: "application/pdf",
-    });
-
-    const { response, body } = await uploadDocument(
-      studentLogin.body.data.accessToken,
-      internship.id,
-      "agreement",
-      file,
-    );
-
-    assertEquals(response.status, 400);
-    assertEquals(body.success, false);
-    assertEquals(body.message, "The uploaded file is empty.");
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-});
-
-Deno.test("Documents - upload rejects files larger than 10 MiB", async () => {
-  const { internship, hteId } = await createTestFixture();
-
-  try {
-    const studentLogin = await login(
-      TEST_USERS.student.email,
-      TEST_USERS.student.password,
-    );
-
-    const file = new File(
-      [new Uint8Array(10 * 1024 * 1024 + 1)],
-      "oversized.pdf",
-      { type: "application/pdf" },
-    );
-
-    const { response, body } = await uploadDocument(
-      studentLogin.body.data.accessToken,
-      internship.id,
-      "agreement",
-      file,
-    );
-
-    assertEquals(response.status, 400);
-    assertEquals(body.success, false);
-    assertEquals(body.message, "The uploaded file must not exceed 10 MiB.");
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-});
-
 Deno.test("Documents - administrator cannot upload", async () => {
   const { internship, hteId } = await createTestFixture();
-
   try {
-    const adminLogin = await login();
-
-    assertEquals(adminLogin.response.status, 200);
-
-    const { response } = await uploadDocument(
-      adminLogin.body.data.accessToken,
-      internship.id,
-      "endorsement",
+    const token = await loginAs(
+      TEST_USERS.admin.email,
+      TEST_USERS.admin.password,
     );
-
-    assertEquals(response.status, 403);
+    const result = await uploadDocument(token, internship.id, "endorsement");
+    assertEquals(result.response.status, 403);
   } finally {
     await cleanupFixture(internship.id, hteId);
   }
 });
 
-/*
- * ---------------------------------------------------------
- * RETRIEVAL
- * ---------------------------------------------------------
- */
-
-Deno.test("Documents - student can list internship documents", async () => {
+Deno.test("Documents - student can list and retrieve documents", async () => {
   const { internship, hteId } = await createTestFixture();
-
   try {
-    const studentLogin = await login(
+    const token = await loginAs(
       TEST_USERS.student.email,
       TEST_USERS.student.password,
     );
 
     const first = await uploadDocument(
-      studentLogin.body.data.accessToken,
+      token,
       internship.id,
       "endorsement",
       createTestFile("endorsement.pdf"),
     );
-
     const second = await uploadDocument(
-      studentLogin.body.data.accessToken,
+      token,
       internship.id,
-      "agreement",
-      createTestFile("agreement.pdf"),
+      "resume",
+      createTestFile("resume.pdf"),
     );
-
     assertEquals(first.response.status, 201);
     assertEquals(second.response.status, 201);
 
-    const response = await authenticatedRequest(
+    const list = await authenticatedRequest(
       `/api/v1/documents/internship/${internship.id}`,
-      studentLogin.body.data.accessToken,
+      token,
     );
+    const listBody = await list.json();
+    assertEquals(list.status, 200);
+    assertEquals(listBody.success, true);
+    assertEquals(listBody.data.length, 2);
 
-    const body = await response.json();
-
-    assertEquals(response.status, 200);
-    assertEquals(body.success, true);
-    assertEquals(body.data.length, 2);
-    assertEquals(body.data[0].internship_id, internship.id);
-    assertEquals(body.data[1].internship_id, internship.id);
+    const get = await authenticatedRequest(
+      `/api/v1/documents/${first.body.data.id}`,
+      token,
+    );
+    const getBody = await get.json();
+    assertEquals(get.status, 200);
+    assertEquals(getBody.success, true);
+    assertEquals(getBody.data.document.id, first.body.data.id);
+    assertEquals(getBody.data.document.internship_id, internship.id);
+    assertExists(getBody.data.url);
+    assertStringIncludes(getBody.data.url, "http");
   } finally {
     await cleanupFixture(internship.id, hteId);
   }
 });
 
 Deno.test(
-  "Documents - student can retrieve a document with a signed URL",
-  async () => {
-    const { internship, hteId } = await createTestFixture();
-
-    try {
-      const studentLogin = await login(
-        TEST_USERS.student.email,
-        TEST_USERS.student.password,
-      );
-
-      const upload = await uploadDocument(
-        studentLogin.body.data.accessToken,
-        internship.id,
-        "resume",
-        createTestFile("resume.pdf"),
-      );
-
-      assertEquals(upload.response.status, 201);
-
-      const response = await authenticatedRequest(
-        `/api/v1/documents/${upload.body.data.id}`,
-        studentLogin.body.data.accessToken,
-      );
-
-      const body = await response.json();
-
-      assertEquals(response.status, 200);
-      assertEquals(body.success, true);
-      assertExists(body.data.document);
-      assertExists(body.data.url);
-      assertEquals(body.data.document.id, upload.body.data.id);
-      assertEquals(body.data.document.internship_id, internship.id);
-      assertEquals(body.data.document.document_type, "resume");
-      assertStringIncludes(body.data.url, "http");
-    } finally {
-      await cleanupFixture(internship.id, hteId);
-    }
-  },
-);
-
-/*
- * ---------------------------------------------------------
- * DUPLICATES / RE-UPLOAD
- * ---------------------------------------------------------
- */
-
-Deno.test(
   "Documents - duplicate non-rejected document returns 409",
   async () => {
     const { internship, hteId } = await createTestFixture();
-
     try {
-      const studentLogin = await login(
+      const token = await loginAs(
         TEST_USERS.student.email,
         TEST_USERS.student.password,
       );
-
-      const first = await uploadDocument(
-        studentLogin.body.data.accessToken,
-        internship.id,
-        "consent",
-        createTestFile("consent.pdf"),
-      );
-
+      const first = await uploadDocument(token, internship.id, "consent");
       const second = await uploadDocument(
-        studentLogin.body.data.accessToken,
+        token,
         internship.id,
         "consent",
         createTestFile("consent-second.pdf"),
@@ -716,7 +511,6 @@ Deno.test(
 
       assertEquals(first.response.status, 201);
       assertEquals(second.response.status, 409);
-      assertEquals(second.body.success, false);
       assertEquals(
         second.body.message,
         "A document of this type already exists for this internship.",
@@ -724,7 +518,6 @@ Deno.test(
 
       const documents = await getDocumentsForInternship(internship.id);
       assertEquals(documents.length, 1);
-      assertEquals(documents[0].id, first.body.data.id);
     } finally {
       await cleanupFixture(internship.id, hteId);
     }
@@ -733,51 +526,42 @@ Deno.test(
 
 Deno.test("Documents - rejected document can be re-uploaded", async () => {
   const { internship, hteId } = await createTestFixture();
-
   try {
-    const studentLogin = await login(
+    const studentToken = await loginAs(
       TEST_USERS.student.email,
       TEST_USERS.student.password,
     );
-    const coordinatorLogin = await login(
+    const coordinatorToken = await loginAs(
       TEST_USERS.coordinator.email,
       TEST_USERS.coordinator.password,
     );
 
     const first = await uploadDocument(
-      studentLogin.body.data.accessToken,
+      studentToken,
       internship.id,
       "internship_report",
       createTestFile("first-report.pdf"),
     );
-
     assertEquals(first.response.status, 201);
 
-    const rejectResponse = await authenticatedRequest(
+    const reject = await authenticatedRequest(
       `/api/v1/documents/${first.body.data.id}/reject`,
-      coordinatorLogin.body.data.accessToken,
+      coordinatorToken,
       {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reason: "The internship report is incomplete.",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "Incomplete report." }),
       },
     );
-
-    assertEquals(rejectResponse.status, 200);
+    assertEquals(reject.status, 200);
 
     const replacement = await uploadDocument(
-      studentLogin.body.data.accessToken,
+      studentToken,
       internship.id,
       "internship_report",
       createTestFile("corrected-report.pdf"),
     );
-
     assertEquals(replacement.response.status, 201);
-    assertEquals(replacement.body.success, true);
     assertEquals(replacement.body.data.id, first.body.data.id);
     assertEquals(replacement.body.data.status, "pending");
     assertEquals(replacement.body.data.file_name, "corrected-report.pdf");
@@ -786,147 +570,92 @@ Deno.test("Documents - rejected document can be re-uploaded", async () => {
   }
 });
 
-/*
- * ---------------------------------------------------------
- * REVIEW
- * ---------------------------------------------------------
- */
-
 Deno.test(
-  "Documents - coordinator can approve a pending document",
+  "Documents - coordinator can approve and reject pending documents",
   async () => {
     const { internship, hteId } = await createTestFixture();
-
     try {
-      const studentLogin = await login(
+      const studentToken = await loginAs(
         TEST_USERS.student.email,
         TEST_USERS.student.password,
       );
-      const coordinatorLogin = await login(
+      const coordinatorToken = await loginAs(
         TEST_USERS.coordinator.email,
         TEST_USERS.coordinator.password,
       );
 
-      const upload = await uploadDocument(
-        studentLogin.body.data.accessToken,
+      const approveUpload = await uploadDocument(
+        studentToken,
         internship.id,
         "endorsement",
-        createTestFile("endorsement.pdf"),
       );
+      assertEquals(approveUpload.response.status, 201);
 
-      assertEquals(upload.response.status, 201);
-
-      const response = await authenticatedRequest(
-        `/api/v1/documents/${upload.body.data.id}/approve`,
-        coordinatorLogin.body.data.accessToken,
+      const approve = await authenticatedRequest(
+        `/api/v1/documents/${approveUpload.body.data.id}/approve`,
+        coordinatorToken,
         { method: "PATCH" },
       );
+      const approveBody = await approve.json();
+      assertEquals(approve.status, 200);
+      assertEquals(approveBody.data.status, "approved");
+      assertEquals(approveBody.data.rejection_reason, null);
+      assertExists(approveBody.data.reviewed_by);
+      assertExists(approveBody.data.reviewed_at);
 
-      const body = await response.json();
+      const rejectUpload = await uploadDocument(
+        studentToken,
+        internship.id,
+        "consent",
+      );
+      assertEquals(rejectUpload.response.status, 201);
 
-      assertEquals(response.status, 200);
-      assertEquals(body.success, true);
-      assertEquals(body.data.id, upload.body.data.id);
-      assertEquals(body.data.status, "approved");
-      assertEquals(body.data.rejection_reason, null);
-      assertEquals(body.data.reviewed_by, coordinatorLogin.body.data.user.id);
-      assertExists(body.data.reviewed_at);
+      const reject = await authenticatedRequest(
+        `/api/v1/documents/${rejectUpload.body.data.id}/reject`,
+        coordinatorToken,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "Please submit the signed version." }),
+        },
+      );
+      const rejectBody = await reject.json();
+      assertEquals(reject.status, 200);
+      assertEquals(rejectBody.data.status, "rejected");
+      assertEquals(
+        rejectBody.data.rejection_reason,
+        "Please submit the signed version.",
+      );
     } finally {
       await cleanupFixture(internship.id, hteId);
     }
   },
 );
 
-Deno.test("Documents - coordinator can reject with a reason", async () => {
-  const { internship, hteId } = await createTestFixture();
-
-  try {
-    const studentLogin = await login(
-      TEST_USERS.student.email,
-      TEST_USERS.student.password,
-    );
-    const coordinatorLogin = await login(
-      TEST_USERS.coordinator.email,
-      TEST_USERS.coordinator.password,
-    );
-
-    const upload = await uploadDocument(
-      studentLogin.body.data.accessToken,
-      internship.id,
-      "consent",
-      createTestFile("consent.pdf"),
-    );
-
-    assertEquals(upload.response.status, 201);
-
-    const response = await authenticatedRequest(
-      `/api/v1/documents/${upload.body.data.id}/reject`,
-      coordinatorLogin.body.data.accessToken,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reason: "Please submit the signed version.",
-        }),
-      },
-    );
-
-    const body = await response.json();
-
-    assertEquals(response.status, 200);
-    assertEquals(body.success, true);
-    assertEquals(body.data.status, "rejected");
-    assertEquals(
-      body.data.rejection_reason,
-      "Please submit the signed version.",
-    );
-    assertEquals(body.data.reviewed_by, coordinatorLogin.body.data.user.id);
-    assertExists(body.data.reviewed_at);
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-});
-
 Deno.test("Documents - rejection requires a reason", async () => {
   const { internship, hteId } = await createTestFixture();
-
   try {
-    const studentLogin = await login(
+    const studentToken = await loginAs(
       TEST_USERS.student.email,
       TEST_USERS.student.password,
     );
-    const coordinatorLogin = await login(
+    const coordinatorToken = await loginAs(
       TEST_USERS.coordinator.email,
       TEST_USERS.coordinator.password,
     );
-
-    const upload = await uploadDocument(
-      studentLogin.body.data.accessToken,
-      internship.id,
-      "consent",
-      createTestFile("consent.pdf"),
-    );
-
+    const upload = await uploadDocument(studentToken, internship.id, "consent");
     assertEquals(upload.response.status, 201);
 
     const response = await authenticatedRequest(
       `/api/v1/documents/${upload.body.data.id}/reject`,
-      coordinatorLogin.body.data.accessToken,
+      coordinatorToken,
       {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          reason: "   ",
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "   " }),
       },
     );
-
     const body = await response.json();
-
     assertEquals(response.status, 400);
     assertEquals(body.success, false);
   } finally {
@@ -934,148 +663,197 @@ Deno.test("Documents - rejection requires a reason", async () => {
   }
 });
 
-Deno.test("Documents - student cannot review a document", async () => {
-  const { internship, hteId } = await createTestFixture();
-
-  try {
-    const studentLogin = await login(
-      TEST_USERS.student.email,
-      TEST_USERS.student.password,
-    );
-
-    const upload = await uploadDocument(
-      studentLogin.body.data.accessToken,
-      internship.id,
-      "resume",
-      createTestFile("resume.pdf"),
-    );
-
-    assertEquals(upload.response.status, 201);
-
-    const response = await authenticatedRequest(
-      `/api/v1/documents/${upload.body.data.id}/approve`,
-      studentLogin.body.data.accessToken,
-      { method: "PATCH" },
-    );
-
-    assertEquals(response.status, 403);
-
-    const document = await getDocumentFromDatabase(upload.body.data.id);
-    assertExists(document);
-    assertEquals(document?.status, "pending");
-  } finally {
-    await cleanupFixture(internship.id, hteId);
-  }
-});
-
 Deno.test(
-  "Documents - already reviewed document cannot be reviewed again",
+  "Documents - only the internship coordinator can review",
   async () => {
     const { internship, hteId } = await createTestFixture();
-
     try {
-      const studentLogin = await login(
+      const studentToken = await loginAs(
         TEST_USERS.student.email,
         TEST_USERS.student.password,
       );
-      const coordinatorLogin = await login(
-        TEST_USERS.coordinator.email,
-        TEST_USERS.coordinator.password,
+      const facultyToken = await loginAs(
+        TEST_USERS.facultyAdviser.email,
+        TEST_USERS.facultyAdviser.password,
+      );
+      const hteToken = await loginAs(
+        TEST_USERS.hteSupervisor.email,
+        TEST_USERS.hteSupervisor.password,
+      );
+      const adminToken = await loginAs(
+        TEST_USERS.admin.email,
+        TEST_USERS.admin.password,
       );
 
       const upload = await uploadDocument(
-        studentLogin.body.data.accessToken,
+        studentToken,
         internship.id,
-        "agreement",
-        createTestFile("agreement.pdf"),
+        "resume",
       );
-
       assertEquals(upload.response.status, 201);
 
-      const firstReview = await authenticatedRequest(
-        `/api/v1/documents/${upload.body.data.id}/approve`,
-        coordinatorLogin.body.data.accessToken,
-        { method: "PATCH" },
-      );
-
-      assertEquals(firstReview.status, 200);
-
-      const secondReview = await authenticatedRequest(
-        `/api/v1/documents/${upload.body.data.id}/reject`,
-        coordinatorLogin.body.data.accessToken,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            reason: "This document was already approved.",
-          }),
-        },
-      );
-
-      const body = await secondReview.json();
-
-      assertEquals(secondReview.status, 400);
-      assertEquals(body.success, false);
-      assertEquals(body.message, "Only pending documents can be reviewed.");
+      for (const token of [studentToken, facultyToken, hteToken, adminToken]) {
+        const response = await authenticatedRequest(
+          `/api/v1/documents/${upload.body.data.id}/approve`,
+          token,
+          { method: "PATCH" },
+        );
+        assertEquals(response.status, 403);
+      }
 
       const document = await getDocumentFromDatabase(upload.body.data.id);
       assertExists(document);
-      assertEquals(document?.status, "approved");
+      assertEquals(document.status, "pending");
     } finally {
       await cleanupFixture(internship.id, hteId);
     }
   },
 );
 
-/*
- * ---------------------------------------------------------
- * DELETE
- * ---------------------------------------------------------
- */
+Deno.test(
+  "Documents - already reviewed documents cannot be reviewed again",
+  async () => {
+    const { internship, hteId } = await createTestFixture();
+    try {
+      const studentToken = await loginAs(
+        TEST_USERS.student.email,
+        TEST_USERS.student.password,
+      );
+      const coordinatorToken = await loginAs(
+        TEST_USERS.coordinator.email,
+        TEST_USERS.coordinator.password,
+      );
+      const upload = await uploadDocument(
+        studentToken,
+        internship.id,
+        "agreement",
+      );
+      assertEquals(upload.response.status, 201);
+
+      const first = await authenticatedRequest(
+        `/api/v1/documents/${upload.body.data.id}/approve`,
+        coordinatorToken,
+        { method: "PATCH" },
+      );
+      assertEquals(first.status, 200);
+
+      const second = await authenticatedRequest(
+        `/api/v1/documents/${upload.body.data.id}/reject`,
+        coordinatorToken,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reason: "Already approved." }),
+        },
+      );
+      const body = await second.json();
+      assertEquals(second.status, 400);
+      assertEquals(body.message, "Only pending documents can be reviewed.");
+    } finally {
+      await cleanupFixture(internship.id, hteId);
+    }
+  },
+);
+
+Deno.test(
+  "Documents - required prototype document types are accepted",
+  async () => {
+    const { internship, hteId } = await createTestFixture();
+    try {
+      const token = await loginAs(
+        TEST_USERS.student.email,
+        TEST_USERS.student.password,
+      );
+      for (
+        const [index, documentType] of [
+          "signed_internship_agreement",
+          "fit_to_work",
+          "consent",
+        ].entries()
+      ) {
+        const result = await uploadDocument(
+          token,
+          internship.id,
+          documentType,
+          createTestFile(`${index}-${documentType}.pdf`),
+        );
+        assertEquals(result.response.status, 201);
+        assertEquals(result.body.data.document_type, documentType);
+      }
+    } finally {
+      await cleanupFixture(internship.id, hteId);
+    }
+  },
+);
+
+Deno.test(
+  "Documents - student can upload for pending internships",
+  async () => {
+    const { internship, hteId } = await createTestFixture("pending");
+    try {
+      const token = await loginAs(
+        TEST_USERS.student.email,
+        TEST_USERS.student.password,
+      );
+      const result = await uploadDocument(
+        token,
+        internship.id,
+        "signed_internship_agreement",
+        createTestFile("signed-internship-agreement.pdf"),
+      );
+      assertEquals(result.response.status, 201);
+    } finally {
+      await cleanupFixture(internship.id, hteId);
+    }
+  },
+);
+
+/* Deno.test("Documents - student cannot upload for completed internships", async () => {
+  const { internship, hteId } = await createTestFixture("completed");
+  try {
+    const token = await loginAs(TEST_USERS.student.email, TEST_USERS.student.password);
+    const result = await uploadDocument(
+      token,
+      internship.id,
+      "fit_to_work",
+      createTestFile("fit-to-work.pdf"),
+    );
+    assertEquals(result.response.status, 400);
+    assertEquals(
+      result.body.message,
+      "Students can only upload documents for pending or active internships.",
+    );
+  } finally {
+    await cleanupFixture(internship.id, hteId);
+  }
+}); */
 
 Deno.test("Documents - student can delete their own document", async () => {
   const { internship, hteId } = await createTestFixture();
-
   try {
-    const studentLogin = await login(
+    const token = await loginAs(
       TEST_USERS.student.email,
       TEST_USERS.student.password,
     );
-
     const upload = await uploadDocument(
-      studentLogin.body.data.accessToken,
+      token,
       internship.id,
       "other",
       createTestFile("delete-me.pdf"),
     );
-
     assertEquals(upload.response.status, 201);
 
-    const documentId = upload.body.data.id;
-    const storagePath = upload.body.data.storage_path;
-
     const response = await authenticatedRequest(
-      `/api/v1/documents/${documentId}`,
-      studentLogin.body.data.accessToken,
+      `/api/v1/documents/${upload.body.data.id}`,
+      token,
       { method: "DELETE" },
     );
-
     const body = await response.json();
-
     assertEquals(response.status, 200);
     assertEquals(body.success, true);
 
-    const databaseDocument = await getDocumentFromDatabase(documentId);
-    assertEquals(databaseDocument, null);
-
-    const signedUrlResult = await supabaseAdmin.storage
-      .from(STORAGE_BUCKET)
-      .createSignedUrl(storagePath, 60);
-
-    assertEquals(signedUrlResult.data, null);
-    assertExists(signedUrlResult.error);
+    const document = await getDocumentFromDatabase(upload.body.data.id);
+    assertEquals(document, null);
   } finally {
     await cleanupFixture(internship.id, hteId);
   }

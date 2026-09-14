@@ -1,7 +1,9 @@
 export const DOCUMENT_TYPES = [
+  "signed_internship_agreement",
+  "resume",
+  "fit_to_work",
   "endorsement",
   "agreement",
-  "resume",
   "consent",
   "internship_report",
   "other",
@@ -34,3 +36,18 @@ export interface DocumentRecord {
 export interface DocumentReviewInput {
   reason?: string;
 }
+
+/**
+ * Prototype-required internship document types.
+ *
+ * These are application-level required document types for the
+ * prototype. They are intentionally not modeled as a separate
+ * document-requirements subsystem.
+ */
+export const REQUIRED_DOCUMENT_TYPES = [
+  "signed_internship_agreement",
+  "fit_to_work",
+  "consent",
+] as const;
+
+export type RequiredDocumentType = (typeof REQUIRED_DOCUMENT_TYPES)[number];

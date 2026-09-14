@@ -78,10 +78,10 @@
 
 ###############################################################
 @apiUrl=http://localhost:8000/api/v1
-@internshipId=4f735a35-d0d2-406a-b1a5-92fa0fcdf312
-@studentId=0afd9f69-0991-4d14-a0e9-6446b0109e83
-@hteId=ac92d255-8654-48bc-b1fa-48f976022029
-@facultyAdviserId=659ebb6e-7f3e-4832-a8e9-36d995765040
+@internshipId=40a25eb3-ce19-4530-abf9-b0dfd40814e0
+@studentId=fb0a078e-b6b8-4c8d-8f59-fce9329b728f
+@hteId=ecf97cb8-06e6-444e-b1f6-0afcf5784783
+@facultyAdviserId=42150282-0023-4aa7-86ea-acd0e2574395
 
 ###############################################################
 
@@ -114,7 +114,7 @@
 ### Paste a valid administrator access token here.
 
 @adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
-@coordinatorAccessToken=PASTE_COORDINATOR_ACCESS_TOKEN_HERE
+@coordinatorAccessToken=
 @studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
 @facultyAccessToken=PASTE_FACULTY_ACCESS_TOKEN_HERE
@@ -332,7 +332,10 @@ Content-Type: application/json
 {
 "studentId": "{{studentId}}",
 "hteId": "{{hteId}}",
-"requiredHours": 425
+"requiredHours": 300,
+"startDate": "2026-06-05",
+"endDate": "2026-07-30",
+"facultyAdviserId": "{{facultyAdviserId}}"
 }
 
 ###
@@ -919,4 +922,24 @@ Content-Type: application/json
 
 {
     "facultyAdviserId": "{{facultyAdviserId}}"
+}
+
+
+###############################################################
+
+## Update Internship (Admin or Intenship Coordinator)
+
+###############################################################
+
+PATCH {{apiUrl}}/internships/{{internshipId}}
+Authorization: Bearer {{coordinatorAccessToken}}
+Content-Type: application/json
+
+{
+"requiredHours": 250,
+"startDate": "2026-09-13",
+"endDate": "2026-10-30",
+"hteId": "{{hteId}}",
+"facultyAdviserId": "{{facultyAdviserId}}"
+
 }

@@ -1,0 +1,17 @@
+name: Quality Check - Reporting
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  quality-gate:
+    uses: ./.github/workflows/_quality-module.yml
+    with:
+      module: reports
+      unit_task: test:unit:reports
+      integration_task: test:integration:reports
+    secrets: inherit

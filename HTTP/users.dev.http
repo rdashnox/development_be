@@ -33,7 +33,7 @@
 ###############################################################
 
 @admin=adminsbims1@grr.la
-@student=studentsbims1@grr.la
+@student=studentsbims17@grr.la
 @faculty=facultysbims1@grr.la
 @coordinator=coordinatorsbims2@grr.la
 @hte=htesbims1@grr.la
@@ -49,9 +49,9 @@
 
 # Replace after login
 
-@adminToken=PASTE_ADMIN_ACCESS_TOKEN
-@studentToken=PASTE_STUDENT_ACCESS_TOKEN
-@coordinatorToken=PASTE_COORDINATOR_ACCESS_TOKEN
+@adminToken=
+@studentToken=
+@coordinatorToken=
 @facultyToken=PASTE_FACULTY_ACCESS_TOKEN
 @hteToken=PASTE_HTE_ACCESS_TOKEN
 ###############################################################
@@ -62,7 +62,7 @@
 
 # Replace after creating user
 
-@userId=0afd9f69-0991-4d14-a0e9-6446b0109e83
+@userId=fb0a078e-b6b8-4c8d-8f59-fce9329b728f
 
 
 
@@ -104,6 +104,15 @@ Content-Type: application/json
   "password": "{{defaultPassword}}"
 }
 
+###
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{student}}",
+  "password": "{{newPassword}}"
+}
+
 
 
 
@@ -142,7 +151,7 @@ Authorization: Bearer {{adminToken}}
 ### - Returns profile information
 
 GET {{apiUrl}}/users/{{userId}}
-Authorization: Bearer {{coordinatorToken}}
+Authorization: Bearer {{adminToken}}
 
 
 
@@ -165,13 +174,13 @@ Authorization: Bearer {{adminToken}}
 Content-Type: application/json
 
 {
-  "email": "newstudent.sbims@test.com",
-  "firstName": "Juan",
-  "middleName": "Dela",
-  "lastName": "Cruz",
-  "suffix": null,
+  "email": "studentsbims17@grr.la",
+  "firstName": "Lionel",
+  "middleName": "Victor",
+  "lastName": "Messi",
+  "suffix": "III",
   "role": "student",
-  "password": "Password2026!"
+  "password": "Dev2026!"
 }
 
 
@@ -414,12 +423,12 @@ GET {{apiUrl}}/users
 
 ###############################################################
 
-GET {{apiUrl}}/users/role/hte_supervisor
+GET {{apiUrl}}/users/role/faculty_adviser
 Authorization: Bearer {{coordinatorToken}}
 Content-Type: application/json
 
 ###############################################################
 
 GET {{apiUrl}}/users/role/student
-Authorization: Bearer {{adminToken}}
+Authorization: Bearer {{coordinatorToken}}
 Content-Type: application/json

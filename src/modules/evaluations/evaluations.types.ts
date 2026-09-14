@@ -1,4 +1,6 @@
-export type EvaluationType = "hte_supervisor";
+export const EVALUATION_TYPES = ["hte_supervisor", "faculty_adviser"] as const;
+
+export type EvaluationType = (typeof EVALUATION_TYPES)[number];
 
 export type EvaluationStatus = "draft" | "submitted";
 

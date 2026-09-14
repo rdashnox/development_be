@@ -61,7 +61,7 @@
 ###############################################################
 
 @admin=adminsbims1@grr.la
-@student=studentsbims1@grr.la
+@student=studentsbims17@grr.la
 @faculty=facultysbims1@grr.la
 @coordinator=coordinatorsbims1@grr.la
 ###
@@ -79,7 +79,7 @@
 ###############################################################
 
 @adminUserId=ADD_HERE
-@studentUserId=0afd9f69-0991-4d14-a0e9-6446b0109e83
+@studentUserId=fb0a078e-b6b8-4c8d-8f59-fce9329b728f
 @facultyUserId=cd315baa-c628-4ff9-9f71-9caae86ed096
 @coordinatorUserId=01501d31-a58b-4034-8b5c-b0b6f9ece378
 
@@ -93,10 +93,10 @@
 
 ###############################################################
 
-@adminToken=PASTE_ADMIN_ACCESS_TOKEN
-@studentToken=PASTE_STUDENT_ACCESS_TOKEN
+@adminToken=
+@studentToken=
 @facultyToken=PASTE_FACULTY_ACCESS_TOKEN
-@coordinatorToken=PASTE_COORDINATOR_ACCESS_TOKEN
+@coordinatorToken=
 @hteToken=PASTE_HTE_ACCESS_TOKEN
 
 ###############################################################
@@ -160,7 +160,7 @@ Content-Type: application/json
 
 {
 "email": "{{student}}",
-"password": "{{defaultPassword}}"
+"password": "{{newPassword}}"
 }
 
 ###############################################################
@@ -188,7 +188,7 @@ Content-Type: application/json
 
 {
 "email": "{{admin}}",
-"password": "{{newPassword}}"
+"password": "{{defaultPassword}}"
 }
 
 ###############################################################
@@ -231,13 +231,13 @@ Content-Type: application/json
 
 {
 "userId": "{{studentUserId}}",
-"studentNumber": "2023001",
-"program": "BS Computer Science",
+"studentNumber": "2023-00001",
+"program": "Bachelor of Science in Statistics",
 "yearLevel": 3,
-"section": "A1",
+"section": "BSS-3E",
 "contactNumber": "09123456789",
 "address": "3494 Lucban Avenue, Makati City, Metro Manila",
-"emergencyContactName": "Juan Cruz",
+"emergencyContactName": "Juan Messi",
 "emergencyContactNumber": "09987654321"
 }
 

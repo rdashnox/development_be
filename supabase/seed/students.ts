@@ -16,9 +16,6 @@ interface SeedStudent {
 }
 
 const seedStudents: readonly SeedStudent[] = [
-  // =====================================================
-  // Student 01
-  // =====================================================
   {
     seedKey: "student-01",
     email: "studentsbims1@grr.la",
@@ -32,12 +29,6 @@ const seedStudents: readonly SeedStudent[] = [
     emergencyContactNumber: "09181234567",
   },
 
-  // student-02 is intentionally excluded because
-  // must_change_password=true.
-
-  // =====================================================
-  // Student 03
-  // =====================================================
   {
     seedKey: "student-03",
     email: "studentsbims3@grr.la",
@@ -51,9 +42,6 @@ const seedStudents: readonly SeedStudent[] = [
     emergencyContactNumber: "09191234567",
   },
 
-  // =====================================================
-  // Student 04
-  // =====================================================
   {
     seedKey: "student-04",
     email: "studentsbims4@grr.la",
@@ -67,9 +55,6 @@ const seedStudents: readonly SeedStudent[] = [
     emergencyContactNumber: "09221234567",
   },
 
-  // =====================================================
-  // Student 05
-  // =====================================================
   {
     seedKey: "student-05",
     email: "studentsbims5@grr.la",
@@ -83,9 +68,6 @@ const seedStudents: readonly SeedStudent[] = [
     emergencyContactNumber: "09321234567",
   },
 
-  // =====================================================
-  // Student 06
-  // =====================================================
   {
     seedKey: "student-06",
     email: "studentsbims6@grr.la",
@@ -97,6 +79,136 @@ const seedStudents: readonly SeedStudent[] = [
     address: "Blk 6 Lot 21, Phase 3, Brgy. Commonwealth, Quezon City, Metro Manila",
     emergencyContactName: "Bianca Mallari",
     emergencyContactNumber: "09421234567",
+  },
+
+  {
+    seedKey: "student-07",
+    email: "studentsbims7@grr.la",
+    studentNumber: "2025-00718",
+    program: "Bachelor of Science in Information Technology",
+    yearLevel: 4,
+    section: "BSIT-4A",
+    contactNumber: "09661234567",
+    address: "Blk 4 Lot 10, Brgy. Holy Spirit, Quezon City, Metro Manila",
+    emergencyContactName: "Ramon Santos",
+    emergencyContactNumber: "09561234567",
+  },
+
+  {
+    seedKey: "student-08",
+    email: "studentsbims8@grr.la",
+    studentNumber: "2025-00829",
+    program: "Bachelor of Science in Computer Science",
+    yearLevel: 4,
+    section: "BSCS-4B",
+    contactNumber: "09771234567",
+    address: "Blk 12 Lot 8, Brgy. Fairview, Quezon City, Metro Manila",
+    emergencyContactName: "Liza Mendoza",
+    emergencyContactNumber: "09671234567",
+  },
+
+  {
+    seedKey: "student-09",
+    email: "studentsbims9@grr.la",
+    studentNumber: "2025-00934",
+    program: "Bachelor of Science in Computer Engineering",
+    yearLevel: 4,
+    section: "BSCPE-4B",
+    contactNumber: "09881234567",
+    address: "Blk 7 Lot 19, Brgy. Novaliches Proper, Quezon City, Metro Manila",
+    emergencyContactName: "Antonio Rivera",
+    emergencyContactNumber: "09781234567",
+  },
+
+  {
+    seedKey: "student-10",
+    email: "studentsbims10@grr.la",
+    studentNumber: "2025-01045",
+    program: "Bachelor of Science in Information Technology",
+    yearLevel: 4,
+    section: "BSIT-4B",
+    contactNumber: "09991234567",
+    address: "Blk 2 Lot 14, Brgy. Bagong Ilog, Pasig City, Metro Manila",
+    emergencyContactName: "Teresa Torres",
+    emergencyContactNumber: "09891234567",
+  },
+
+  {
+    seedKey: "student-11",
+    email: "studentsbims11@grr.la",
+    studentNumber: "2025-01156",
+    program: "Bachelor of Science in Computer Science",
+    yearLevel: 4,
+    section: "BSCS-4A",
+    contactNumber: "09181239876",
+    address: "House 22, Sampaguita Street, Brgy. Commonwealth, Quezon City, Metro Manila",
+    emergencyContactName: "Maribel Cruz",
+    emergencyContactNumber: "09081239876",
+  },
+
+  {
+    seedKey: "student-12",
+    email: "studentsbims12@grr.la",
+    studentNumber: "2025-01267",
+    program: "Bachelor of Science in Information Technology",
+    yearLevel: 4,
+    section: "BSIT-4C",
+    contactNumber: "09282345671",
+    address: "Blk 15 Lot 6, Brgy. San Isidro, Parañaque City, Metro Manila",
+    emergencyContactName: "Rogelio Reyes",
+    emergencyContactNumber: "09182345671",
+  },
+
+  {
+    seedKey: "student-13",
+    email: "studentsbims13@grr.la",
+    studentNumber: "2025-01378",
+    program: "Bachelor of Science in Computer Engineering",
+    yearLevel: 4,
+    section: "BSCPE-4A",
+    contactNumber: "09383456712",
+    address: "Blk 3 Lot 11, Brgy. San Agustin, Dasmariñas City, Cavite",
+    emergencyContactName: "Nora Garcia",
+    emergencyContactNumber: "09283456712",
+  },
+
+  {
+    seedKey: "student-14",
+    email: "studentsbims14@grr.la",
+    studentNumber: "2025-01489",
+    program: "Bachelor of Science in Information Technology",
+    yearLevel: 4,
+    section: "BSIT-4D",
+    contactNumber: "09484567823",
+    address: "Unit 5C, 17 Ortigas Avenue Extension, Pasig City, Metro Manila",
+    emergencyContactName: "Cynthia Villanueva",
+    emergencyContactNumber: "09384567823",
+  },
+
+  {
+    seedKey: "student-15",
+    email: "studentsbims15@grr.la",
+    studentNumber: "2025-01590",
+    program: "Bachelor of Science in Computer Science",
+    yearLevel: 4,
+    section: "BSCS-4B",
+    contactNumber: "09585678934",
+    address: "Blk 8 Lot 3, Brgy. Bagong Silang, Caloocan City, Metro Manila",
+    emergencyContactName: "Eduardo Cabrera",
+    emergencyContactNumber: "09485678934",
+  },
+
+  {
+    seedKey: "student-16",
+    email: "studentsbims16@grr.la",
+    studentNumber: "2025-01601",
+    program: "Bachelor of Science in Information Technology",
+    yearLevel: 4,
+    section: "BSIT-4A",
+    contactNumber: "09686789045",
+    address: "Blk 10 Lot 17, Brgy. San Antonio, Pasig City, Metro Manila",
+    emergencyContactName: "Grace Dela Cruz",
+    emergencyContactNumber: "09586789045",
   },
 ];
 

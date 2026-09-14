@@ -167,6 +167,106 @@ const seedUsers: readonly SeedUser[] = [
     role: "student",
     mustChangePassword: false,
   },
+  {
+    seedKey: "student-07",
+    email: "studentsbims7@grr.la",
+    firstName: "Joshua Miguel",
+    middleName: "Reyes",
+    lastName: "Santos",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-08",
+    email: "studentsbims8@grr.la",
+    firstName: "Angela Mae",
+    middleName: "Cruz",
+    lastName: "Mendoza",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-09",
+    email: "studentsbims9@grr.la",
+    firstName: "Christian Paolo",
+    middleName: "Garcia",
+    lastName: "Rivera",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-10",
+    email: "studentsbims10@grr.la",
+    firstName: "Katrina Anne",
+    middleName: "Villanueva",
+    lastName: "Torres",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-11",
+    email: "studentsbims11@grr.la",
+    firstName: "Miguel Andres",
+    middleName: "Cruz",
+    lastName: "Navarro",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-12",
+    email: "studentsbims12@grr.la",
+    firstName: "Andrea Nicole",
+    middleName: "Reyes",
+    lastName: "Santos",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-13",
+    email: "studentsbims13@grr.la",
+    firstName: "Paolo Vincent",
+    middleName: "Garcia",
+    lastName: "Mendoza",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-14",
+    email: "studentsbims14@grr.la",
+    firstName: "Jasmine Claire",
+    middleName: "Torres",
+    lastName: "Rivera",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-15",
+    email: "studentsbims15@grr.la",
+    firstName: "Mark Anthony",
+    middleName: "Santos",
+    lastName: "Villanueva",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "student-16",
+    email: "studentsbims16@grr.la",
+    firstName: "Nicole Anne",
+    middleName: "Dela Cruz",
+    lastName: "Cabrera",
+    suffix: null,
+    role: "student",
+    mustChangePassword: false,
+  },
   // =====================================================
   // HTE Supervisors
   // =====================================================
@@ -188,7 +288,7 @@ const seedUsers: readonly SeedUser[] = [
     lastName: "Dominguez",
     suffix: null,
     role: "hte_supervisor",
-    mustChangePassword: true,
+    mustChangePassword: false,
   },
   {
     seedKey: "hte-supervisor-03",
@@ -206,6 +306,46 @@ const seedUsers: readonly SeedUser[] = [
     firstName: "Elena",
     middleName: "Santos",
     lastName: "Fajardo",
+    suffix: null,
+    role: "hte_supervisor",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "hte-supervisor-05",
+    email: "htesbims5@grr.la",
+    firstName: "Joshua Miguel",
+    middleName: "Reyes",
+    lastName: "Santos",
+    suffix: null,
+    role: "hte_supervisor",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "hte-supervisor-06",
+    email: "htesbims6@grr.la",
+    firstName: "Angela Mae",
+    middleName: "Cruz",
+    lastName: "Mendoza",
+    suffix: null,
+    role: "hte_supervisor",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "hte-supervisor-07",
+    email: "htesbims7@grr.la",
+    firstName: "Christian Paolo",
+    middleName: "Garcia",
+    lastName: "Rivera",
+    suffix: null,
+    role: "hte_supervisor",
+    mustChangePassword: false,
+  },
+  {
+    seedKey: "hte-supervisor-08",
+    email: "htesbims8@grr.la",
+    firstName: "Katrina Anne",
+    middleName: "Villanueva",
+    lastName: "Torres",
     suffix: null,
     role: "hte_supervisor",
     mustChangePassword: false,
@@ -315,6 +455,13 @@ async function reconcileExistingProfile(
       last_name: user.lastName,
       suffix: user.suffix ?? null,
       role: user.role,
+      ...(user.role === "hte_supervisor"
+        ? {
+          is_active: true,
+          must_change_password: false,
+          last_password_changed_at: new Date().toISOString(),
+        }
+        : {}),
     })
     .eq("id", userId);
 
@@ -416,38 +563,13 @@ function validateSeedUsers(): void {
     seenSeedKeys.add(user.seedKey);
   }
 
-  const roles: UserRole[] = [
-    "administrator",
-    "internship_coordinator",
-    "faculty_adviser",
-    "student",
-    "hte_supervisor",
-  ];
-
-  for (const role of roles) {
-    const usersForRole = seedUsers.filter((user) => user.role === role);
-    const usersRequiringPasswordChange = usersForRole.filter(
-      (user) => user.mustChangePassword,
+  const hteSupervisors = seedUsers.filter(
+    (user) => user.role === "hte_supervisor",
+  );
+  if (hteSupervisors.some((user) => user.mustChangePassword)) {
+    throw new Error(
+      "All HTE supervisor seed users must be usable and mustChangePassword=false.",
     );
-
-    if (role === "administrator") {
-      if (usersRequiringPasswordChange.length > 1) {
-        throw new Error(
-          `Expected at most one ${role} seed user with ` +
-            `mustChangePassword=true, found ` +
-            `${usersRequiringPasswordChange.length}.`,
-        );
-      }
-      continue;
-    }
-
-    if (usersRequiringPasswordChange.length !== 1) {
-      throw new Error(
-        `Expected exactly one ${role} seed user with ` +
-          `mustChangePassword=true, found ` +
-          `${usersRequiringPasswordChange.length}.`,
-      );
-    }
   }
 }
 

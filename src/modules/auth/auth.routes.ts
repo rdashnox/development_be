@@ -25,6 +25,9 @@ import type { RateLimitStore } from "../../infrastructure/rate-limit/rate-limit.
 import { requireRole } from "./role.middleware.ts";
 import type { AuthRole } from "./auth.types.ts";
 
+// FR-11: Audit Logging
+import { AuditService } from "../audit/audit.service.ts";
+
 export function createAuthRoutes(
   frontendUrl: string,
   rateLimitStore: RateLimitStore,
@@ -52,6 +55,19 @@ export function createAuthRoutes(
       const authService = new AuthService(supabase, frontendUrl);
 
       const result = await authService.login(body);
+
+      // FR-11: Record a successful login in the audit trail.
+      // Audit failure must not cause an otherwise successful login to fail.
+      const auditService = new AuditService(supabase);
+
+      await auditService.log({
+        userId: result.user.id,
+        action: "LOGIN",
+        resourceType: "AUTH",
+        resourceId: result.user.id,
+        details: {},
+        ipAddress: c.req.header("x-forwarded-for")?.split(",")[0]?.trim() ?? null,
+      });
 
       return c.json({
         success: true,

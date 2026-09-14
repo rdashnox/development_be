@@ -27,6 +27,7 @@ interface InternshipAuthorizationRecord {
   student_id: string;
   hte_id: string;
   faculty_adviser_id: string | null;
+  status: "pending" | "active" | "completed";
   hte_profiles: {
     supervisor_id: string | null;
   } | null;
@@ -114,6 +115,13 @@ export class DocumentService {
   ): Promise<InternshipAuthorizationRecord> {
     const internship = await this.getInternship(internshipId);
 
+    if (operation === "review" && role !== "internship_coordinator") {
+      throw new AppError(
+        403,
+        "Only internship coordinators can review documents.",
+      );
+    }
+
     if (role === "administrator" || role === "internship_coordinator") {
       if (operation === "upload" && role === "administrator") {
         throw new AppError(
@@ -132,6 +140,13 @@ export class DocumentService {
 
       if (operation === "review") {
         throw new AppError(403, "Students cannot review documents.");
+      }
+
+      if (operation === "upload" && internship.status === "completed") {
+        throw new AppError(
+          400,
+          "Students can only upload documents for pending or active internships.",
+        );
       }
 
       return internship;
@@ -404,6 +419,13 @@ export class DocumentService {
     status: Extract<DocumentStatus, "approved" | "rejected">,
     reason?: string,
   ): Promise<DocumentRecord> {
+    if (role !== "internship_coordinator") {
+      throw new AppError(
+        403,
+        "Only internship coordinators can review documents.",
+      );
+    }
+
     const document = await this.getDocumentById(documentId);
 
     await this.authorizeInternshipAccess(

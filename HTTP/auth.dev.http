@@ -26,7 +26,7 @@
 @apiUrl=http://localhost:8000/api/v1
 
 ### Access token from a successful login
-@accessToken=PASTE_ACCESS_TOKEN_HERE
+@accessToken=eyJhbGciOiJFUzI1NiIsImtpZCI6IjI4OGQ4NzFhLWEzZDItNDA0Ni04Y2QwLTJlZTJhZmM1NmY4ZiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2NycnBzcXp2bGx4bXh0c3dkaGh6LnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiJmYjBhMDc4ZS1iNmI4LTRjOGQtOGY1OS1mY2U5MzI5YjcyOGYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg5MjI1OTQxLCJpYXQiOjE3ODkyMjIzNDEsImVtYWlsIjoic3R1ZGVudHNiaW1zMTdAZ3JyLmxhIiwicGhvbmUiOiIiLCJhcHBfbWV0YWRhdGEiOnsicHJvdmlkZXIiOiJlbWFpbCIsInByb3ZpZGVycyI6WyJlbWFpbCJdfSwidXNlcl9tZXRhZGF0YSI6eyJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyc3RfbmFtZSI6Ikxpb25lbCIsImxhc3RfbmFtZSI6Ik1lc3NpIiwicm9sZSI6InN0dWRlbnQifSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4OTIyMjM0MX1dLCJzZXNzaW9uX2lkIjoiNjBlMzc4NjYtMWY0Yy00MWY3LWE0YTAtNjdiMjVjNzMxNDk5IiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.rSv7ivoCHKw95m-pKgng-3bt8Ddyal21FxEW0gQWqqPdO-KbpBTnDQUw9GG_XVyVKPKoNyLdZWWhhs8rG91gAg
 # Seed Users
 ###############################################################
 

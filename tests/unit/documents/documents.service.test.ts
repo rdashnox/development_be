@@ -395,7 +395,7 @@ Deno.test(
     await assertRejects(
       () => service.reviewDocument(DOCUMENT_ID, STUDENT_ID, "student", "approved"),
       AppError,
-      "Students cannot review documents.",
+      "Only internship coordinators can review documents.",
     );
   },
 );
@@ -583,7 +583,7 @@ Deno.test(
       createDocument({
         id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
         document_type: "resume",
-        file_name: "resume.pdf",
+        file_name: "document.pdf",
       }),
     ];
 
@@ -809,7 +809,7 @@ Deno.test(
 
     const reviewed = createDocument({
       status: "approved",
-      reviewed_by: FACULTY_ID,
+      reviewed_by: COORDINATOR_ID,
       reviewed_at: "2026-09-04T09:00:00.000Z",
     });
 
@@ -823,8 +823,8 @@ Deno.test(
 
     const result = await service.reviewDocument(
       DOCUMENT_ID,
-      FACULTY_ID,
-      "faculty_adviser",
+      COORDINATOR_ID,
+      "internship_coordinator",
       "approved",
     );
 
@@ -840,7 +840,7 @@ Deno.test(
 
     const reviewed = createDocument({
       status: "rejected",
-      reviewed_by: FACULTY_ID,
+      reviewed_by: COORDINATOR_ID,
       reviewed_at: "2026-09-04T09:00:00.000Z",
       rejection_reason: "Please submit the signed version.",
     });
@@ -855,8 +855,8 @@ Deno.test(
 
     const result = await service.reviewDocument(
       DOCUMENT_ID,
-      FACULTY_ID,
-      "faculty_adviser",
+      COORDINATOR_ID,
+      "internship_coordinator",
       "rejected",
       "  Please submit the signed version.  ",
     );
@@ -879,8 +879,8 @@ Deno.test(
       () =>
         service.reviewDocument(
           DOCUMENT_ID,
-          FACULTY_ID,
-          "faculty_adviser",
+          COORDINATOR_ID,
+          "internship_coordinator",
           "rejected",
           "   ",
         ),
@@ -905,8 +905,8 @@ Deno.test(
       () =>
         service.reviewDocument(
           DOCUMENT_ID,
-          FACULTY_ID,
-          "faculty_adviser",
+          COORDINATOR_ID,
+          "internship_coordinator",
           "approved",
         ),
       AppError,
@@ -944,3 +944,80 @@ Deno.test(
     );
   },
 );
+
+Deno.test(
+  "FR-09 student upload is rejected for completed internship",
+  async () => {
+    const service = createService({
+      databaseResults: [
+        {
+          data: createInternship({ status: "completed" }),
+        },
+      ],
+    });
+
+    await assertRejects(
+      () =>
+        service.uploadDocument(
+          STUDENT_ID,
+          "student",
+          INTERNSHIP_ID,
+          "fit_to_work",
+          createTestFile("fit-to-work.pdf"),
+        ),
+      AppError,
+      "Students can only upload documents for pending or active internships.",
+    );
+  },
+);
+
+Deno.test("FR-09 faculty adviser cannot review documents", async () => {
+  const service = createService({
+    databaseResults: [{ data: createDocument() }],
+  });
+
+  await assertRejects(() =>
+    service.reviewDocument(
+      DOCUMENT_ID,
+      COORDINATOR_ID,
+      "internship_coordinator",
+      "approved",
+    )
+  );
+});
+
+Deno.test("FR-09 HTE supervisor cannot review documents", async () => {
+  const service = createService({
+    databaseResults: [{ data: createDocument() }],
+  });
+
+  await assertRejects(
+    () =>
+      service.reviewDocument(
+        DOCUMENT_ID,
+        HTE_SUPERVISOR_ID,
+        "hte_supervisor",
+        "approved",
+      ),
+    AppError,
+    "Only internship coordinators can review documents.",
+  );
+});
+
+Deno.test("FR-09 administrator cannot review documents", async () => {
+  const service = createService({
+    databaseResults: [{ data: createDocument() }],
+  });
+
+  await assertRejects(
+    () =>
+      service.reviewDocument(
+        DOCUMENT_ID,
+        ADMIN_ID,
+        "administrator",
+        "approved",
+      ),
+    AppError,
+    "Only internship coordinators can review documents.",
+  );
+});

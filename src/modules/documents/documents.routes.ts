@@ -243,17 +243,10 @@ documents.delete(
  * Allowed roles:
  * - administrator
  * - internship_coordinator
- * - faculty_adviser
- * - hte_supervisor
  */
 documents.patch(
   "/:id/approve",
-  requireRole(
-    "administrator",
-    "internship_coordinator",
-    "faculty_adviser",
-    "hte_supervisor",
-  ),
+  requireRole("internship_coordinator"),
   async (c) => {
     const documentId = c.req.param("id");
 
@@ -296,19 +289,11 @@ documents.patch(
  * }
  *
  * Allowed roles:
- * - administrator
  * - internship_coordinator
- * - faculty_adviser
- * - hte_supervisor
  */
 documents.patch(
   "/:id/reject",
-  requireRole(
-    "administrator",
-    "internship_coordinator",
-    "faculty_adviser",
-    "hte_supervisor",
-  ),
+  requireRole("internship_coordinator"),
   zValidator("json", rejectDocumentSchema),
   async (c) => {
     const documentId = c.req.param("id");

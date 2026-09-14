@@ -37,9 +37,6 @@ interface SeedHte {
 }
 
 const seedHtes: readonly SeedHte[] = [
-  // =====================================================
-  // HTE 01
-  // =====================================================
   {
     seedKey: "hte-01",
     companyName: "ABC Computing Solutions, Inc.",
@@ -51,9 +48,6 @@ const seedHtes: readonly SeedHte[] = [
     supervisorEmail: "htesbims1@grr.la",
   },
 
-  // =====================================================
-  // HTE 02
-  // =====================================================
   {
     seedKey: "hte-02",
     companyName: "DEF Engineering Corporation",
@@ -65,9 +59,6 @@ const seedHtes: readonly SeedHte[] = [
     supervisorEmail: "htesbims3@grr.la",
   },
 
-  // =====================================================
-  // HTE 03
-  // =====================================================
   {
     seedKey: "hte-03",
     companyName: "GHI Applied Technologies, Inc.",
@@ -77,6 +68,60 @@ const seedHtes: readonly SeedHte[] = [
     contactEmail: "elena.fajardo@ghi-applied-tech.tech",
     contactNumber: "0917-524-8136",
     supervisorEmail: "htesbims4@grr.la",
+  },
+
+  {
+    seedKey: "hte-04",
+    companyName: "Jupiter Digital Systems, Inc.",
+    address:
+      "5/F Jupiter Technology Center, 12 Jupiter Street, Barangay Bel-Air, Makati City, Metro Manila",
+    contactPerson: "Joshua Miguel R. Santos",
+    contactEmail: "joshua.santos@jupiterdigital.ph",
+    contactNumber: "0917-634-2185",
+    supervisorEmail: "htesbims5@grr.la",
+  },
+
+  {
+    seedKey: "hte-05",
+    companyName: "Northstar Software Labs",
+    address: "8/F Northstar Tower, 88 EDSA, Barangay Wack-Wack, Mandaluyong City, Metro Manila",
+    contactPerson: "Angela Mae C. Mendoza",
+    contactEmail: "angela.mendoza@northstarlabs.ph",
+    contactNumber: "0918-745-3296",
+    supervisorEmail: "htesbims6@grr.la",
+  },
+
+  {
+    seedKey: "hte-06",
+    companyName: "Manila Cloudworks Corporation",
+    address:
+      "10/F Cloudworks Building, 101 Dela Rosa Street, Barangay San Lorenzo, Makati City, Metro Manila",
+    contactPerson: "Christian P. Rivera",
+    contactEmail: "christian.rivera@manilacloudworks.ph",
+    contactNumber: "0919-856-4317",
+    supervisorEmail: "htesbims7@grr.la",
+  },
+
+  {
+    seedKey: "hte-07",
+    companyName: "Cavite Technology Solutions",
+    address:
+      "2/F CTS Innovation Hub, 45 Governor's Drive, Barangay San Agustin, Dasmariñas City, Cavite",
+    contactPerson: "Katrina A. Torres",
+    contactEmail: "katrina.torres@cavitetecsolutions.ph",
+    contactNumber: "0920-967-5428",
+    supervisorEmail: "htesbims8@grr.la",
+  },
+
+  {
+    seedKey: "hte-08",
+    companyName: "Metro Data Services Philippines",
+    address:
+      "6/F Metro Data Center, 26 Ortigas Avenue Extension, Barangay Rosario, Pasig City, Metro Manila",
+    contactPerson: "Patricia Anne R. Dominguez",
+    contactEmail: "patricia.dominguez@metrodata.ph",
+    contactNumber: "0921-178-6539",
+    supervisorEmail: "htesbims2@grr.la",
   },
 ];
 
@@ -197,6 +242,7 @@ async function reconcileExistingHte(
       contact_email: hte.contactEmail,
       contact_number: hte.contactNumber,
       supervisor_id: supervisorId,
+      is_active: true,
     })
     .eq("id", existingHte.id);
 

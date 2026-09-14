@@ -10,7 +10,7 @@ export const createEvaluationSchema = z.object({
   internship_id: z.string().uuid(),
 
   evaluation_type: z
-    .literal("hte_supervisor")
+    .enum(["hte_supervisor", "faculty_adviser"])
     .optional()
     .default("hte_supervisor"),
 

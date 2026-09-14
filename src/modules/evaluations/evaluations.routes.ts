@@ -20,20 +20,35 @@ evaluations.use("*", requireAuth);
 /**
  * POST /evaluations
  *
- * HTE Supervisor creates an evaluation for
- * a student intern assigned to their HTE.
+ * Creates an evaluation for an eligible internship.
+ *
+ * HTE Supervisor:
+ *   Creates "hte_supervisor" evaluations.
+ *
+ * Faculty Adviser:
+ *   Creates "faculty_adviser" evaluations.
  */
 evaluations.post(
   "/",
-  requireRole("hte_supervisor"),
+  requireRole("hte_supervisor", "faculty_adviser"),
   zValidator("json", createEvaluationSchema),
   async (c) => {
     const evaluationService = new EvaluationService(c.get("supabase"));
 
     const user = c.get("user");
+    const role = c.get("userRole");
+
+    if (role !== "hte_supervisor" && role !== "faculty_adviser") {
+      throw new AppError(403, "You are not authorized to create evaluations.");
+    }
+
     const body = c.req.valid("json");
 
-    const result = await evaluationService.createEvaluation(user.id, body);
+    const result = await evaluationService.createEvaluation(
+      user.id,
+      role,
+      body,
+    );
 
     return c.json(
       {
@@ -48,21 +63,36 @@ evaluations.post(
 /**
  * GET /evaluations/me
  *
- * HTE Supervisor retrieves evaluations associated
- * with their assigned HTE internships.
+ * HTE Supervisor:
+ *   Retrieves evaluations associated with their assigned HTE.
+ *
+ * Faculty Adviser:
+ *   Retrieves evaluations for internships assigned to them.
  */
-evaluations.get("/me", requireRole("hte_supervisor"), async (c) => {
-  const evaluationService = new EvaluationService(c.get("supabase"));
+evaluations.get(
+  "/me",
+  requireRole("hte_supervisor", "faculty_adviser"),
+  async (c) => {
+    const evaluationService = new EvaluationService(c.get("supabase"));
 
-  const user = c.get("user");
+    const user = c.get("user");
+    const role = c.get("userRole");
 
-  const result = await evaluationService.getMyEvaluations(user.id);
+    if (role !== "hte_supervisor" && role !== "faculty_adviser") {
+      throw new AppError(
+        403,
+        "You are not authorized to access evaluator evaluations.",
+      );
+    }
 
-  return c.json({
-    success: true,
-    data: result,
-  });
-});
+    const result = await evaluationService.getMyEvaluations(user.id, role);
+
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
 
 /**
  * GET /evaluations/internship/:internshipId
@@ -70,17 +100,29 @@ evaluations.get("/me", requireRole("hte_supervisor"), async (c) => {
  * Retrieves evaluations for an internship.
  *
  * HTE Supervisor:
- *   Must be the supervisor assigned to the internship's HTE.
+ *   Can access evaluations for internships assigned to their HTE.
+ *
+ * Faculty Adviser:
+ *   Can access evaluations for internships assigned to them.
  *
  * Student:
- *   Must own the internship and evaluations must be submitted.
+ *   Can access only submitted evaluations for their own internship.
  *
  * Internship Coordinator:
- *   Can access evaluations as part of internship management.
+ *   Read access.
+ *
+ * Administrator:
+ *   Read access.
  */
 evaluations.get(
   "/internship/:internshipId",
-  requireRole("hte_supervisor", "student", "internship_coordinator"),
+  requireRole(
+    "administrator",
+    "internship_coordinator",
+    "faculty_adviser",
+    "student",
+    "hte_supervisor",
+  ),
   async (c) => {
     const evaluationService = new EvaluationService(c.get("supabase"));
 
@@ -94,9 +136,11 @@ evaluations.get(
     }
 
     if (
-      role !== "hte_supervisor" &&
+      role !== "administrator" &&
+      role !== "internship_coordinator" &&
+      role !== "faculty_adviser" &&
       role !== "student" &&
-      role !== "internship_coordinator"
+      role !== "hte_supervisor"
     ) {
       throw new AppError(403, "You are not authorized to access evaluations.");
     }
@@ -117,13 +161,24 @@ evaluations.get(
 /**
  * GET /evaluations/:id
  *
- * HTE Supervisor, student, or internship coordinator
- * retrieves a specific evaluation according to
- * the service-level authorization rules.
+ * Read access:
+ * - Administrator
+ * - Internship Coordinator
+ * - Faculty Adviser
+ * - HTE Supervisor
+ * - Student
+ *
+ * Resource-level authorization is enforced by EvaluationService.
  */
 evaluations.get(
   "/:id",
-  requireRole("hte_supervisor", "student", "internship_coordinator"),
+  requireRole(
+    "administrator",
+    "internship_coordinator",
+    "faculty_adviser",
+    "student",
+    "hte_supervisor",
+  ),
   async (c) => {
     const evaluationService = new EvaluationService(c.get("supabase"));
 
@@ -137,9 +192,11 @@ evaluations.get(
     }
 
     if (
-      role !== "hte_supervisor" &&
+      role !== "administrator" &&
+      role !== "internship_coordinator" &&
+      role !== "faculty_adviser" &&
       role !== "student" &&
-      role !== "internship_coordinator"
+      role !== "hte_supervisor"
     ) {
       throw new AppError(403, "You are not authorized to access evaluations.");
     }
@@ -156,16 +213,25 @@ evaluations.get(
 /**
  * PATCH /evaluations/:id
  *
- * HTE Supervisor updates their own draft evaluation.
+ * HTE Supervisor or Faculty Adviser updates their
+ * own draft evaluation.
+ *
+ * Submitted evaluations are immutable.
  */
 evaluations.patch(
   "/:id",
-  requireRole("hte_supervisor"),
+  requireRole("hte_supervisor", "faculty_adviser"),
   zValidator("json", updateEvaluationSchema),
   async (c) => {
     const evaluationService = new EvaluationService(c.get("supabase"));
 
     const user = c.get("user");
+    const role = c.get("userRole");
+
+    if (role !== "hte_supervisor" && role !== "faculty_adviser") {
+      throw new AppError(403, "You are not authorized to update evaluations.");
+    }
+
     const id = c.req.param("id");
 
     if (!id) {
@@ -174,7 +240,12 @@ evaluations.patch(
 
     const body = c.req.valid("json");
 
-    const result = await evaluationService.updateEvaluation(id, user.id, body);
+    const result = await evaluationService.updateEvaluation(
+      id,
+      user.id,
+      role,
+      body,
+    );
 
     return c.json({
       success: true,
@@ -186,25 +257,37 @@ evaluations.patch(
 /**
  * POST /evaluations/:id/submit
  *
- * HTE Supervisor submits their own draft evaluation.
+ * HTE Supervisor or Faculty Adviser submits
+ * their own draft evaluation.
+ *
  * Submission is final and cannot be edited afterward.
  */
-evaluations.post("/:id/submit", requireRole("hte_supervisor"), async (c) => {
-  const evaluationService = new EvaluationService(c.get("supabase"));
+evaluations.post(
+  "/:id/submit",
+  requireRole("hte_supervisor", "faculty_adviser"),
+  async (c) => {
+    const evaluationService = new EvaluationService(c.get("supabase"));
 
-  const user = c.get("user");
-  const id = c.req.param("id");
+    const user = c.get("user");
+    const role = c.get("userRole");
 
-  if (!id) {
-    throw new AppError(400, "Evaluation ID is required.");
-  }
+    if (role !== "hte_supervisor" && role !== "faculty_adviser") {
+      throw new AppError(403, "You are not authorized to submit evaluations.");
+    }
 
-  const result = await evaluationService.submitEvaluation(id, user.id);
+    const id = c.req.param("id");
 
-  return c.json({
-    success: true,
-    data: result,
-  });
-});
+    if (!id) {
+      throw new AppError(400, "Evaluation ID is required.");
+    }
+
+    const result = await evaluationService.submitEvaluation(id, user.id, role);
+
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
 
 export default evaluations;

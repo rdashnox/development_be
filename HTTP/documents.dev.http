@@ -1,152 +1,91 @@
-*###############################################################*
+###############################################################
 
-*# SBIMS API*
+# SBIMS API
+# Documents Module - FR-09
 
-*# Documents Module - FR-09*
+# Development Manual Test Suite
 
-*#*
+# Order of execution:
+# 1. Health Check
+# 2. Login as Student
+# 3. Upload Document
+# 4. List Internship Documents
+# 5. Retrieve Document
+# 6. Login as Internship Coordinator
+# 7. Approve Document
+# 8. Attempt Review of Already Reviewed Document
+# 9. Upload Another Document
+# 10. Reject Document
+# 11. Student Re-upload After Rejection
+# 12. Duplicate Document Test
+# 13. Student Delete Document
+# 14. Administrator Upload Authorization Test
+# 15. HTE Supervisor Access Test
+# 16. Invalid Upload Tests
 
-*# Development Manual Test Suite*
-
-*#*
-
-*# Order of execution:*
-
-*# 1. Health Check*
-
-*# 2. Login as Student*
-
-*# 3. Upload Document*
-
-*# 4. List Internship Documents*
-
-*# 5. Retrieve Document*
-
-*# 6. Login as Internship Coordinator*
-
-*# 7. Approve Document*
-
-*# 8. Attempt Review of Already Reviewed Document*
-
-*# 9. Upload Another Document*
-
-*# 10. Reject Document*
-
-*# 11. Student Re-upload After Rejection*
-
-*# 12. Duplicate Document Test*
-
-*# 13. Student Delete Document*
-
-*# 14. Administrator Upload Authorization Test*
-
-*# 15. HTE Supervisor Access Test*
-
-*# 16. Invalid Upload Tests*
-
-*###############################################################*
-
-*###############################################################*
-
-*# Variables*
-
-*###############################################################*
+###############################################################
+# Variables
+###############################################################
 
 @apiUrl=http://localhost:8000/api/v1
 
-*###*
-
-*### Replace these values with IDs from the active test database.*
-
+### Replace these values with IDs from the active test database.
 @internshipId=REPLACE_WITH_INTERNSHIP_UUID
-
 @documentId=REPLACE_WITH_DOCUMENT_UUID
-
 @secondDocumentId=REPLACE_WITH_SECOND_DOCUMENT_UUID
-
-*###*
-
-*### Path to a real test file.*
-
-*### VSCode REST Client supports @filename for multipart uploads.*
 
 @testFile=./fixtures/sample-document.pdf
 
-*###############################################################*
+###############################################################
 
-*# Seed Users*
+# Seed Users
 
-*###############################################################*
+###############################################################
 
-@admin=[adminsbims1@grr.la](mailto:adminsbims1@grr.la)
+@admin=adminsbims1@grr.la
+@coordinator=coordinatorsbims1@grr.la
 
-@coordinator=[coordinatorsbims1@grr.la](mailto:coordinatorsbims1@grr.la)
+@faculty=mailto:facultysbims1@grr.la
 
-@faculty=[facultysbims1@grr.la](mailto:facultysbims1@grr.la)
+@student=studentsbims1@grr.la
 
-@student=[studentsbims1@grr.la](mailto:studentsbims1@grr.la)
+@hte=htesbims1@grr.la
 
-@hte=[htesbims1@grr.la](mailto:htesbims1@grr.la)
-
-*###############################################################*
-
-*# Password*
-
-*###############################################################*
-
+###############################################################
+# Password
+###############################################################
 @password=Dev2026!
+###############################################################
 
-*###############################################################*
+# Access Tokens
+###############################################################
 
-*# Access Tokens*
-
-*###############################################################*
-
-*### These are populated manually after successful login.*
+### These are populated manually after successful login.
 
 @studentToken=REPLACE_WITH_STUDENT_ACCESS_TOKEN
-
 @coordinatorToken=REPLACE_WITH_COORDINATOR_ACCESS_TOKEN
-
 @adminToken=REPLACE_WITH_ADMIN_ACCESS_TOKEN
-
 @facultyToken=REPLACE_WITH_FACULTY_ACCESS_TOKEN
-
 @hteToken=REPLACE_WITH_HTE_ACCESS_TOKEN
 
-*###############################################################*
+###############################################################
 
-*# HEALTH*
 
-*###############################################################*
+# LOGIN - STUDENT
 
-*### Health Check*
+###############################################################
 
-*### Expected:*
+### Login as Student
 
-*### - HTTP 200*
+###
 
-*### - API is running*
+### Expected:
 
-GET {{apiUrl}}/health
+### - HTTP 200
 
-*###############################################################*
+### - accessToken returned
 
-*# LOGIN - STUDENT*
-
-*###############################################################*
-
-*### Login as Student*
-
-*###*
-
-*### Expected:*
-
-*### - HTTP 200*
-
-*### - accessToken returned*
-
-*### - Copy accessToken to @studentToken*
+### - Copy accessToken to @studentToken
 
 POST {{apiUrl}}/auth/login
 
@@ -157,27 +96,27 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
-*###############################################################*
+###############################################################
 
-*# UPLOAD DOCUMENT*
+# UPLOAD DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Upload Student Endorsement*
+### Upload Student Endorsement
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 201*
+### - HTTP 201
 
-*### - success = true*
+### - success = true
 
-*### - document record returned*
+### - document record returned
 
-*### - status = pending*
+### - status = pending
 
-*### - document_type = endorsement*
+### - document_type = endorsement
 
 POST {{apiUrl}}/documents
 
@@ -199,71 +138,71 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# LIST DOCUMENTS*
+# LIST DOCUMENTS
 
-*###############################################################*
+###############################################################
 
-*### List Documents for Internship*
+### List Documents for Internship
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - data is an array*
+### - data is an array
 
-*### - uploaded endorsement appears in the list*
+### - uploaded endorsement appears in the list
 
 GET {{apiUrl}}/documents/internship/{{internshipId}}
 
 Authorization: Bearer {{studentToken}}
 
-*###############################################################*
+###############################################################
 
-*# GET DOCUMENT*
+# GET DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Retrieve Document Metadata and Signed URL*
+### Retrieve Document Metadata and Signed URL
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - document metadata returned*
+### - document metadata returned
 
-*### - url contains a temporary signed download URL*
+### - url contains a temporary signed download URL
 
 GET {{apiUrl}}/documents/{{documentId}}
 
 Authorization: Bearer {{studentToken}}
 
-*###############################################################*
+###############################################################
 
-*# LOGIN - COORDINATOR*
+# LOGIN - COORDINATOR
 
-*###############################################################*
+###############################################################
 
-*### Login as Internship Coordinator*
+### Login as Internship Coordinator
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - accessToken returned*
+### - accessToken returned
 
-*### - Copy accessToken to @coordinatorToken*
+### - Copy accessToken to @coordinatorToken
 
 POST {{apiUrl}}/auth/login
 
@@ -274,93 +213,93 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
-*###############################################################*
+###############################################################
 
-*# COORDINATOR LIST*
+# COORDINATOR LIST
 
-*###############################################################*
+###############################################################
 
-*### Coordinator Lists Internship Documents*
+### Coordinator Lists Internship Documents
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - documents are returned*
+### - documents are returned
 
 GET {{apiUrl}}/documents/internship/{{internshipId}}
 
 Authorization: Bearer {{coordinatorToken}}
 
-*###############################################################*
+###############################################################
 
-*# APPROVE DOCUMENT*
+# APPROVE DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Approve Pending Document*
+### Approve Pending Document
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - status = approved*
+### - status = approved
 
-*### - reviewed_by is populated*
+### - reviewed_by is populated
 
-*### - reviewed_at is populated*
+### - reviewed_at is populated
 
-*### - rejection_reason = null*
-
-PATCH {{apiUrl}}/documents/{{documentId}}/approve
-
-Authorization: Bearer {{coordinatorToken}}
-
-*###############################################################*
-
-*# REVIEW ALREADY APPROVED DOCUMENT*
-
-*###############################################################*
-
-*### Attempt to Approve Already Approved Document*
-
-*###*
-
-*### Expected:*
-
-*### - HTTP 400*
-
-*### - Only pending documents can be reviewed*
+### - rejection_reason = null
 
 PATCH {{apiUrl}}/documents/{{documentId}}/approve
 
 Authorization: Bearer {{coordinatorToken}}
 
-*###############################################################*
+###############################################################
 
-*# UPLOAD SECOND DOCUMENT*
+# REVIEW ALREADY APPROVED DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Upload Agreement Document*
+### Attempt to Approve Already Approved Document
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 201*
+### - HTTP 400
 
-*### - status = pending*
+### - Only pending documents can be reviewed
 
-*### - document_type = agreement*
+PATCH {{apiUrl}}/documents/{{documentId}}/approve
+
+Authorization: Bearer {{coordinatorToken}}
+
+###############################################################
+
+# UPLOAD SECOND DOCUMENT
+
+###############################################################
+
+### Upload Agreement Document
+
+###
+
+### Expected:
+
+### - HTTP 201
+
+### - status = pending
+
+### - document_type = agreement
 
 POST {{apiUrl}}/documents
 
@@ -382,27 +321,27 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# REJECT DOCUMENT*
+# REJECT DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Reject Pending Agreement*
+### Reject Pending Agreement
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - status = rejected*
+### - status = rejected
 
-*### - rejection_reason is populated*
+### - rejection_reason is populated
 
-*### - reviewed_by is populated*
+### - reviewed_by is populated
 
-*### - reviewed_at is populated*
+### - reviewed_at is populated
 
 PATCH {{apiUrl}}/documents/{{secondDocumentId}}/reject
 
@@ -413,21 +352,21 @@ Content-Type: application/json
 "reason": "Document is incomplete. Please upload the signed version."
 }
 
-*###############################################################*
+###############################################################
 
-*# REJECT WITHOUT REASON*
+# REJECT WITHOUT REASON
 
-*###############################################################*
+###############################################################
 
-*### Attempt to Reject Without a Reason*
+### Attempt to Reject Without a Reason
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 400*
+### - HTTP 400
 
-*### - A rejection reason is required.*
+### - A rejection reason is required.
 
 PATCH {{apiUrl}}/documents/{{secondDocumentId}}/reject
 
@@ -438,31 +377,31 @@ Content-Type: application/json
 "reason": ""
 }
 
-*###############################################################*
+###############################################################
 
-*# RE-UPLOAD REJECTED DOCUMENT*
+# RE-UPLOAD REJECTED DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Student Re-uploads Rejected Agreement*
+### Student Re-uploads Rejected Agreement
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 201*
+### - HTTP 201
 
-*### - same document record is reused*
+### - same document record is reused
 
-*### - status returns to pending*
+### - status returns to pending
 
-*### - reviewed_by is cleared*
+### - reviewed_by is cleared
 
-*### - reviewed_at is cleared*
+### - reviewed_at is cleared
 
-*### - rejection_reason is cleared*
+### - rejection_reason is cleared
 
-*### - document_type remains agreement*
+### - document_type remains agreement
 
 POST {{apiUrl}}/documents
 
@@ -484,21 +423,21 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# DUPLICATE DOCUMENT*
+# DUPLICATE DOCUMENT
 
-*###############################################################*
+###############################################################
 
-*### Attempt Duplicate Pending Agreement Upload*
+### Attempt Duplicate Pending Agreement Upload
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 409*
+### - HTTP 409
 
-*### - Existing pending document cannot be uploaded again*
+### - Existing pending document cannot be uploaded again
 
 POST {{apiUrl}}/documents
 
@@ -520,43 +459,43 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# STUDENT DELETE*
+# STUDENT DELETE
 
-*###############################################################*
+###############################################################
 
-*### Delete Student-Owned Document*
+### Delete Student-Owned Document
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - database metadata removed*
+### - database metadata removed
 
-*### - corresponding storage object removed*
+### - corresponding storage object removed
 
 DELETE {{apiUrl}}/documents/{{documentId}}
 
 Authorization: Bearer {{studentToken}}
 
-*###############################################################*
+###############################################################
 
-*# ADMINISTRATOR LOGIN*
+# ADMINISTRATOR LOGIN
 
-*###############################################################*
+###############################################################
 
-*### Login as Administrator*
+### Login as Administrator
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
 POST {{apiUrl}}/auth/login
 
@@ -567,21 +506,21 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
-*###############################################################*
+###############################################################
 
-*# ADMIN UPLOAD AUTHORIZATION*
+# ADMIN UPLOAD AUTHORIZATION
 
-*###############################################################*
+###############################################################
 
-*### Administrator Attempts Document Upload*
+### Administrator Attempts Document Upload
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 403*
+### - HTTP 403
 
-*### - Administrator cannot upload documents*
+### - Administrator cannot upload documents
 
 POST {{apiUrl}}/documents
 
@@ -603,19 +542,19 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# HTE SUPERVISOR LOGIN*
+# HTE SUPERVISOR LOGIN
 
-*###############################################################*
+###############################################################
 
-*### Login as HTE Supervisor*
+### Login as HTE Supervisor
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
 POST {{apiUrl}}/auth/login
 
@@ -626,59 +565,59 @@ Content-Type: application/json
 "password": "{{password}}"
 }
 
-*###############################################################*
+###############################################################
 
-*# HTE SUPERVISOR ACCESS*
+# HTE SUPERVISOR ACCESS
 
-*###############################################################*
+###############################################################
 
-*### HTE Supervisor Retrieves Assigned Internship Documents*
+### HTE Supervisor Retrieves Assigned Internship Documents
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - assigned HTE internship documents are returned*
+### - assigned HTE internship documents are returned
 
 GET {{apiUrl}}/documents/internship/{{internshipId}}
 
 Authorization: Bearer {{hteToken}}
 
-*###############################################################*
+###############################################################
 
-*# UNAUTHENTICATED ACCESS*
+# UNAUTHENTICATED ACCESS
 
-*###############################################################*
+###############################################################
 
-*### List Documents Without Authentication*
+### List Documents Without Authentication
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 401*
+### - HTTP 401
 
 GET {{apiUrl}}/documents/internship/{{internshipId}}
 
-*###############################################################*
+###############################################################
 
-*# INVALID DOCUMENT TYPE*
+# INVALID DOCUMENT TYPE
 
-*###############################################################*
+###############################################################
 
-*### Upload With Unsupported Document Type*
+### Upload With Unsupported Document Type
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 400*
+### - HTTP 400
 
-*### - Invalid document upload data*
+### - Invalid document upload data
 
 POST {{apiUrl}}/documents
 
@@ -700,21 +639,21 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# MISSING FILE*
+# MISSING FILE
 
-*###############################################################*
+###############################################################
 
-*### Upload Without File*
+### Upload Without File
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 400*
+### - HTTP 400
 
-*### - A document file is required.*
+### - A document file is required.
 
 POST {{apiUrl}}/documents
 
@@ -731,19 +670,19 @@ Content-Disposition: form-data; name="document_type"
 other
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# INVALID INTERNSHIP*
+# INVALID INTERNSHIP
 
-*###############################################################*
+###############################################################
 
-*### Upload Using Non-Existing Internship ID*
+### Upload Using Non-Existing Internship ID
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 403 or 404 depending on resource authorization path*
+### - HTTP 403 or 404 depending on resource authorization path
 
 POST {{apiUrl}}/documents
 
@@ -765,29 +704,29 @@ Content-Type: application/pdf
 < ./fixtures/sample-document.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# INVALID FILE TYPE*
+# INVALID FILE TYPE
 
-*###############################################################*
+###############################################################
 
-*### Upload Unsupported MIME Type*
+### Upload Unsupported MIME Type
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 400*
+### - HTTP 400
 
-*### - Unsupported file type*
+### - Unsupported file type
 
-*### - Use an unsupported file such as .txt for this test.*
+### - Use an unsupported file such as .txt for this test.
 
-*###*
+###
 
-*### NOTE:*
+### NOTE:
 
-*### Replace the path below with an actual unsupported file.*
+### Replace the path below with an actual unsupported file.
 
 POST {{apiUrl}}/documents
 
@@ -809,27 +748,27 @@ Content-Type: text/plain
 < ./fixtures/unsupported.txt
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# EMPTY FILE*
+# EMPTY FILE
 
-*###############################################################*
+###############################################################
 
-*### Upload Empty File*
+### Upload Empty File
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 400*
+### - HTTP 400
 
-*### - Empty files are rejected*
+### - Empty files are rejected
 
-*###*
+###
 
-*### NOTE:*
+### NOTE:
 
-*### Replace the path below with an empty PDF file.*
+### Replace the path below with an empty PDF file.
 
 POST {{apiUrl}}/documents
 
@@ -851,28 +790,28 @@ Content-Type: application/pdf
 < ./fixtures/empty.pdf
 ------SBIMSBoundary--
 
-*###############################################################*
+###############################################################
 
-*# FINAL DOCUMENT LIST*
+# FINAL DOCUMENT LIST
 
-*###############################################################*
+###############################################################
 
-*### Verify Final Internship Document State*
+### Verify Final Internship Document State
 
-*###*
+###
 
-*### Expected:*
+### Expected:
 
-*### - HTTP 200*
+### - HTTP 200
 
-*### - success = true*
+### - success = true
 
-*### - remaining documents are returned*
+### - remaining documents are returned
 
 GET {{apiUrl}}/documents/internship/{{internshipId}}
 
 Authorization: Bearer {{studentToken}}
 
-*###############################################################*
-*# END FR-09 MANUAL TEST SUITE*
-*###############################################################*
+###############################################################
+# END FR-09 MANUAL TEST SUITE
+###############################################################

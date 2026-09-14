@@ -1,6 +1,15 @@
 ###############################################################
 # FR-08 EVALUATION MANAGEMENT
 # Manual REST Client Tests
+#
+# Current implementation:
+# - HTE Supervisor evaluations
+# - Faculty Adviser evaluations
+# - Draft -> Submitted lifecycle
+# - Final eligibility required for create/submit
+# - Evaluator ownership enforced
+# - Student read-only access to submitted evaluations
+# - Administrator / Coordinator read-only access
 ###############################################################
 
 
@@ -10,30 +19,37 @@
 
 @apiUrl=http://localhost:8000/api/v1
 
-### Internship ID
-### Replace after creating the test internship.
 
-@internshipId=00000000-0000-0000-0000-000000000000
+###############################################################
+# SEEDED EVALUATION-READY INTERNSHIP
+###############################################################
 
-### Evaluation ID
-### Replace after creating an evaluation.
+### Use the seeded completed internship for Student 1.
+###
+### Seeded configuration:
+### Student: studentsbims1@grr.la
+### HTE: HTE 1
+### Faculty Adviser: Faculty Adviser 1
+### Start: 2026-08-17
+### End: 2026-09-12
+### Required Hours: 150
+### Status: completed
+### Validated Rendered Hours: 150
 
-@evaluationId=00000000-0000-0000-0000-000000000000
+@internshipId=REPLACE_WITH_STUDENT1_INTERNSHIP_UUID
 
-### Student ID
-### Use the ID of the student account being tested.
 
-@studentId=00000000-0000-0000-0000-000000000000
+###############################################################
+# EVALUATION IDs
+###############################################################
 
-### HTE ID
-### Replace after creating the test HTE.
+### Replace after creating the HTE evaluation.
 
-@hteId=00000000-0000-0000-0000-000000000000
+@hteEvaluationId=REPLACE_WITH_HTE_EVALUATION_UUID
 
-### Second HTE ID
-### Optional. Used for authorization testing.
+### Replace after creating the Faculty Adviser evaluation.
 
-@hteId2=00000000-0000-0000-0000-000000000000
+@facultyEvaluationId=REPLACE_WITH_FACULTY_EVALUATION_UUID
 
 
 ###############################################################
@@ -42,15 +58,40 @@
 
 @admin=adminsbims1@grr.la
 @coordinator=coordinatorsbims1@grr.la
+
+### Evaluation-ready student
+
 @student=studentsbims1@grr.la
+
+### Faculty Adviser assigned to Student 1
+
 @faculty=facultysbims1@grr.la
 
-### HTE Supervisor accounts
+### HTE Supervisor assigned to Student 1
+###
+### Replace with the actual seeded HTE Supervisor 1 account.
+### If your users seed uses a different email, use that account.
 
-@hteSupervisor=sbims-test-hte-supervisor@maildrop.cc
-@otherHteSupervisor=sbims-test-hte-supervisor-2@maildrop.cc
+@hteSupervisor=htesbims1@grr.la
+@hteSupervisorAccessToken=REPLACE_WITH_HTE_SUPERVISOR_ACCESS_TOKEN
 
-### Shared test password
+
+###############################################################
+# OTHER USERS
+###############################################################
+
+### Another HTE Supervisor who is NOT assigned to Student 1.
+
+@otherHteSupervisor=htesbims2@grr.la
+
+### Faculty Adviser who is NOT assigned to Student 1.
+
+@otherFaculty=facultysbims3@grr.la
+
+
+###############################################################
+# SHARED TEST PASSWORD
+###############################################################
 
 @password=TestPassword2026!
 
@@ -58,6 +99,7 @@
 ###############################################################
 # AUTHENTICATION
 ###############################################################
+
 
 ### Login as Administrator
 
@@ -124,19 +166,53 @@ Content-Type: application/json
 }
 
 
+### Login as Faculty Adviser
+
+# @name facultyLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{faculty}}",
+  "password": "{{password}}"
+}
+
+
+### Login as Other Faculty Adviser
+
+# @name otherFacultyLogin
+
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{otherFaculty}}",
+  "password": "{{password}}"
+}
+
+
 ###############################################################
 # HTE SUPERVISOR - CREATE
 ###############################################################
 
-### 1. Create Evaluation
-### Expected: 201 Created
-### Access: HTE Supervisor
-###
-### IMPORTANT:
-### internshipId must belong to an HTE assigned to
-### the authenticated HTE Supervisor.
 
-# @name createEvaluation
+### 1. HTE Supervisor Creates Evaluation
+###
+### Expected: 201 Created
+###
+### Conditions:
+### - Authenticated HTE Supervisor
+### - Assigned to the internship's HTE
+### - evaluation_type = hte_supervisor
+### - Internship period has ended
+### - Required hours are set
+### - Validated rendered hours >= required hours
+###
+### NOTE:
+### The seeded Student 1 internship should satisfy these conditions.
+
+# @name createHteEvaluation
 
 POST {{apiUrl}}/evaluations
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
@@ -158,27 +234,30 @@ Content-Type: application/json
 # HTE SUPERVISOR - RETRIEVE
 ###############################################################
 
-### 2. Get My Evaluations
+
+### 2. HTE Supervisor Gets Own Evaluations
+###
 ### Expected: 200 OK
-### Access: HTE Supervisor
 
 GET {{apiUrl}}/evaluations/me
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 
 
-### 3. Get Evaluations for Internship
+### 3. HTE Supervisor Gets Internship Evaluations
+###
 ### Expected: 200 OK
-### Access: HTE Supervisor
+###
+### The HTE Supervisor must be assigned to the internship.
 
 GET {{apiUrl}}/evaluations/internship/{{internshipId}}
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 
 
-### 4. Get Specific Evaluation
+### 4. HTE Supervisor Gets Specific Evaluation
+###
 ### Expected: 200 OK
-### Access: HTE Supervisor
 
-GET {{apiUrl}}/evaluations/{{evaluationId}}
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 
 
@@ -186,12 +265,15 @@ Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 # HTE SUPERVISOR - UPDATE
 ###############################################################
 
-### 5. Update Draft Evaluation
-### Expected: 200 OK
-### Access: HTE Supervisor
-### Only the evaluator who owns the evaluation can update it.
 
-PATCH {{apiUrl}}/evaluations/{{evaluationId}}
+### 5. Update HTE Draft Evaluation
+###
+### Expected: 200 OK
+###
+### The evaluator who owns the evaluation may update
+### a draft evaluation.
+
+PATCH {{apiUrl}}/evaluations/{{hteEvaluationId}}
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 Content-Type: application/json
 
@@ -209,27 +291,35 @@ Content-Type: application/json
 # HTE SUPERVISOR - SUBMIT
 ###############################################################
 
-### 6. Submit Evaluation
+
+### 6. Submit HTE Evaluation
+###
 ### Expected: 200 OK
-### Status changes: draft -> submitted
+### Status: draft -> submitted
+###
+### Final eligibility is checked again before submission.
 
-POST {{apiUrl}}/evaluations/{{evaluationId}}/submit
+POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 
 
-### 7. Try to Submit Again
+### 7. Submit HTE Evaluation Again
+###
 ### Expected: 400 Bad Request
-### Already-submitted evaluations cannot be submitted again.
+###
+### Submitted evaluations cannot be submitted again.
 
-POST {{apiUrl}}/evaluations/{{evaluationId}}/submit
+POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 
 
-### 8. Try to Modify Submitted Evaluation
+### 8. Modify Submitted HTE Evaluation
+###
 ### Expected: 400 Bad Request
+###
 ### Submitted evaluations cannot be modified.
 
-PATCH {{apiUrl}}/evaluations/{{evaluationId}}
+PATCH {{apiUrl}}/evaluations/{{hteEvaluationId}}
 Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
 Content-Type: application/json
 
@@ -239,26 +329,139 @@ Content-Type: application/json
 
 
 ###############################################################
-# STUDENT
+# FACULTY ADVISER - CREATE
 ###############################################################
 
-### 9. Student Retrieves Submitted Evaluation
-### Expected: 200 OK
-### The evaluation must already be submitted.
 
-GET {{apiUrl}}/evaluations/{{evaluationId}}
+### 9. Faculty Adviser Creates Evaluation
+###
+### Expected: 201 Created
+###
+### Conditions:
+### - Authenticated Faculty Adviser
+### - Faculty Adviser is assigned to the internship
+### - evaluation_type = faculty_adviser
+### - Internship is finally eligible
+
+# @name createFacultyEvaluation
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "faculty_adviser",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 5,
+    "criterion_3": 4
+  },
+  "comments": "Student demonstrated satisfactory internship performance."
+}
+
+
+###############################################################
+# FACULTY ADVISER - RETRIEVE
+###############################################################
+
+
+### 10. Faculty Adviser Gets Own Evaluations
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/me
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+
+
+### 11. Faculty Adviser Gets Internship Evaluations
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+
+
+### 12. Faculty Adviser Gets Specific Evaluation
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/{{facultyEvaluationId}}
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+
+
+###############################################################
+# FACULTY ADVISER - UPDATE / SUBMIT
+###############################################################
+
+
+### 13. Update Faculty Adviser Draft
+###
+### Expected: 200 OK
+
+PATCH {{apiUrl}}/evaluations/{{facultyEvaluationId}}
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 5,
+    "criterion_3": 5
+  },
+  "comments": "Updated faculty adviser evaluation."
+}
+
+
+### 14. Submit Faculty Adviser Evaluation
+###
+### Expected: 200 OK
+### Status: draft -> submitted
+
+POST {{apiUrl}}/evaluations/{{facultyEvaluationId}}/submit
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+
+
+### 15. Modify Submitted Faculty Evaluation
+###
+### Expected: 400 Bad Request
+
+PATCH {{apiUrl}}/evaluations/{{facultyEvaluationId}}
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "comments": "Attempted modification after submission."
+}
+
+
+###############################################################
+# STUDENT - READ ONLY
+###############################################################
+
+
+### 16. Student Retrieves Submitted HTE Evaluation
+###
+### Expected: 200 OK
+###
+### Student may view submitted evaluations for own internship.
+
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
 Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
 
 
-### 10. Student Retrieves Internship Evaluations
+### 17. Student Retrieves Internship Evaluations
+###
 ### Expected: 200 OK
-### The evaluation must already be submitted.
+###
+### Only submitted evaluations should be exposed to the student.
 
 GET {{apiUrl}}/evaluations/internship/{{internshipId}}
 Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
 
 
-### 11. Student Attempts to Create Evaluation
+### 18. Student Attempts to Create Evaluation
+###
 ### Expected: 403 Forbidden
 
 POST {{apiUrl}}/evaluations
@@ -267,16 +470,18 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 5
   }
 }
 
 
-### 12. Student Attempts to Modify Evaluation
+### 19. Student Attempts to Modify Evaluation
+###
 ### Expected: 403 Forbidden
 
-PATCH {{apiUrl}}/evaluations/{{evaluationId}}
+PATCH {{apiUrl}}/evaluations/{{hteEvaluationId}}
 Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
 Content-Type: application/json
 
@@ -285,10 +490,11 @@ Content-Type: application/json
 }
 
 
-### 13. Student Attempts to Submit Evaluation
+### 20. Student Attempts to Submit Evaluation
+###
 ### Expected: 403 Forbidden
 
-POST {{apiUrl}}/evaluations/{{evaluationId}}/submit
+POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit
 Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
 
 
@@ -296,25 +502,28 @@ Authorization: Bearer {{studentLogin.response.body.$.data.accessToken}}
 # HTE SUPERVISOR AUTHORIZATION
 ###############################################################
 
-### 14. Other HTE Supervisor Attempts to View Evaluation
+
+### 21. Unassigned HTE Supervisor Views Evaluation
+###
 ### Expected: 403 Forbidden
 ###
-### This proves that role alone is insufficient.
-### The HTE Supervisor must be assigned to the HTE
-### associated with the internship.
+### Role alone is insufficient.
+### The HTE Supervisor must be assigned to the internship.
 
-GET {{apiUrl}}/evaluations/{{evaluationId}}
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
 Authorization: Bearer {{otherHteSupervisorLogin.response.body.$.data.accessToken}}
 
 
-### 15. Other HTE Supervisor Attempts to View Internship Evaluations
+### 22. Unassigned HTE Supervisor Views Internship Evaluations
+###
 ### Expected: 403 Forbidden
 
 GET {{apiUrl}}/evaluations/internship/{{internshipId}}
 Authorization: Bearer {{otherHteSupervisorLogin.response.body.$.data.accessToken}}
 
 
-### 16. Other HTE Supervisor Attempts to Create Evaluation
+### 23. Unassigned HTE Supervisor Creates Evaluation
+###
 ### Expected: 403 Forbidden
 
 POST {{apiUrl}}/evaluations
@@ -323,6 +532,7 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 5,
     "criterion_2": 4
@@ -331,10 +541,148 @@ Content-Type: application/json
 
 
 ###############################################################
+# FACULTY ADVISER AUTHORIZATION
+###############################################################
+
+
+### 24. Unassigned Faculty Adviser Views Evaluation
+###
+### Expected: 403 Forbidden
+
+GET {{apiUrl}}/evaluations/{{facultyEvaluationId}}
+Authorization: Bearer {{otherFacultyLogin.response.body.$.data.accessToken}}
+
+
+### 25. Unassigned Faculty Adviser Views Internship Evaluations
+###
+### Expected: 403 Forbidden
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{otherFacultyLogin.response.body.$.data.accessToken}}
+
+
+### 26. Unassigned Faculty Adviser Creates Evaluation
+###
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{otherFacultyLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "faculty_adviser",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4
+  }
+}
+
+
+###############################################################
+# EVALUATION TYPE AUTHORIZATION
+###############################################################
+
+
+### 27. HTE Supervisor Attempts Faculty Adviser Evaluation
+###
+### Expected: 403 Forbidden
+###
+### HTE Supervisor may only create hte_supervisor evaluations.
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "faculty_adviser",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4,
+    "criterion_3": 5
+  }
+}
+
+
+### 28. Faculty Adviser Attempts HTE Supervisor Evaluation
+###
+### Expected: 403 Forbidden
+###
+### Faculty Adviser may only create faculty_adviser evaluations.
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4,
+    "criterion_3": 5
+  }
+}
+
+
+###############################################################
+# DUPLICATE EVALUATION
+###############################################################
+
+
+### 29. Duplicate HTE Evaluation
+###
+### Expected: 400 Bad Request
+###
+### Student 1 already has an HTE Supervisor evaluation.
+###
+### The system must prevent another HTE evaluation
+### for the same internship.
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 5,
+    "criterion_3": 5
+  }
+}
+
+
+### 30. Duplicate Faculty Adviser Evaluation
+###
+### Expected: 400 Bad Request
+###
+### Student 1 already has a Faculty Adviser evaluation.
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{facultyLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "faculty_adviser",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 5,
+    "criterion_3": 5
+  }
+}
+
+
+###############################################################
 # VALIDATION TESTS
 ###############################################################
 
-### 17. Invalid Rating - Too High
+
+### 31. Invalid Rating - Too High
+###
 ### Expected: 400 Bad Request
 
 POST {{apiUrl}}/evaluations
@@ -343,13 +691,15 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 6
   }
 }
 
 
-### 18. Invalid Rating - Too Low
+### 32. Invalid Rating - Too Low
+###
 ### Expected: 400 Bad Request
 
 POST {{apiUrl}}/evaluations
@@ -358,13 +708,15 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 0
   }
 }
 
 
-### 19. Invalid Rating - Decimal
+### 33. Invalid Rating - Decimal
+###
 ### Expected: 400 Bad Request
 
 POST {{apiUrl}}/evaluations
@@ -373,13 +725,15 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 4.5
   }
 }
 
 
-### 20. Empty Responses
+### 34. Empty Responses
+###
 ### Expected: 400 Bad Request
 
 POST {{apiUrl}}/evaluations
@@ -388,11 +742,13 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {}
 }
 
 
-### 21. Invalid Internship ID
+### 35. Invalid Internship ID
+###
 ### Expected: 400 Bad Request
 
 POST {{apiUrl}}/evaluations
@@ -401,6 +757,7 @@ Content-Type: application/json
 
 {
   "internship_id": "not-a-uuid",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 5
   }
@@ -408,10 +765,200 @@ Content-Type: application/json
 
 
 ###############################################################
+# FINAL ELIGIBILITY TESTS
+###############################################################
+
+### IMPORTANT:
+### These tests require a NON-ELIGIBLE internship.
+###
+### Use an internship where:
+### - end_date has not passed, OR
+### - required_hours has not been met.
+###
+### Do NOT use the seeded Student 1/3/4 completed internships
+### for these tests because they are intentionally eligible.
+
+
+### 36. Create Evaluation Before Internship Period Ends
+###
+### Expected: 400 Bad Request
+###
+### Expected business error:
+### "The internship period has not ended yet."
+
+# Replace with an active/non-ended internship UUID.
+@ineligibleInternshipId=REPLACE_WITH_INELIGIBLE_INTERNSHIP_UUID
+
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{ineligibleInternshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4,
+    "criterion_3": 5
+  }
+}
+
+
+### 37. Create Evaluation With Insufficient Validated Hours
+###
+### Expected: 400 Bad Request
+###
+### Expected business error:
+### "The required validated rendered hours have not been met."
+###
+### Use an internship whose end date has passed but whose
+### validated rendered hours are below required_hours.
+
+# Replace with an internship that has insufficient hours.
+@insufficientHoursInternshipId=REPLACE_WITH_INSUFFICIENT_HOURS_INTERNSHIP_UUID
+
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{hteSupervisorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{insufficientHoursInternshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5,
+    "criterion_2": 4,
+    "criterion_3": 5
+  }
+}
+
+
+###############################################################
+# ADMINISTRATOR - READ ONLY
+###############################################################
+
+
+### 38. Administrator Gets Specific Evaluation
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Authorization: Bearer {{adminLogin.response.body.$.data.accessToken}}
+
+
+### 39. Administrator Gets Internship Evaluations
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{adminLogin.response.body.$.data.accessToken}}
+
+
+### 40. Administrator Attempts to Create Evaluation
+###
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{adminLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5
+  }
+}
+
+
+### 41. Administrator Attempts to Modify Evaluation
+###
+### Expected: 403 Forbidden
+
+PATCH {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Authorization: Bearer {{adminLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "comments": "Administrator attempting to modify evaluation."
+}
+
+
+### 42. Administrator Attempts to Submit Evaluation
+###
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit
+Authorization: Bearer {{adminLogin.response.body.$.data.accessToken}}
+
+
+###############################################################
+# COORDINATOR - READ ONLY
+###############################################################
+
+
+### 43. Coordinator Gets Specific Evaluation
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Authorization: Bearer {{coordinatorLogin.response.body.$.data.accessToken}}
+
+
+### 44. Coordinator Gets Internship Evaluations
+###
+### Expected: 200 OK
+
+GET {{apiUrl}}/evaluations/internship/{{internshipId}}
+Authorization: Bearer {{coordinatorLogin.response.body.$.data.accessToken}}
+
+
+### 45. Coordinator Attempts to Create Evaluation
+###
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations
+Authorization: Bearer {{coordinatorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
+  "responses": {
+    "criterion_1": 5
+  }
+}
+
+
+### 46. Coordinator Attempts to Modify Evaluation
+###
+### Expected: 403 Forbidden
+
+PATCH {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Authorization: Bearer {{coordinatorLogin.response.body.$.data.accessToken}}
+Content-Type: application/json
+
+{
+  "comments": "Coordinator attempting to modify evaluation."
+}
+
+
+### 47. Coordinator Attempts to Submit Evaluation
+###
+### Expected: 403 Forbidden
+
+POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit
+Authorization: Bearer {{coordinatorLogin.response.body.$.data.accessToken}}
+
+
+###############################################################
 # AUTHENTICATION TESTS
 ###############################################################
 
-### 22. Unauthenticated Create Evaluation
+
+### 48. Unauthenticated Create Evaluation
+###
 ### Expected: 401 Unauthorized
 
 POST {{apiUrl}}/evaluations
@@ -419,13 +966,34 @@ Content-Type: application/json
 
 {
   "internship_id": "{{internshipId}}",
+  "evaluation_type": "hte_supervisor",
   "responses": {
     "criterion_1": 5
   }
 }
 
 
-### 23. Unauthenticated Get Evaluation
+### 49. Unauthenticated Get Evaluation
+###
 ### Expected: 401 Unauthorized
 
-GET {{apiUrl}}/evaluations/{{evaluationId}}
+GET {{apiUrl}}/evaluations/{{hteEvaluationId}}
+
+
+### 50. Unauthenticated Update Evaluation
+###
+### Expected: 401 Unauthorized
+
+PATCH {{apiUrl}}/evaluations/{{hteEvaluationId}}
+Content-Type: application/json
+
+{
+  "comments": "Unauthenticated modification attempt."
+}
+
+
+### 51. Unauthenticated Submit Evaluation
+###
+### Expected: 401 Unauthorized
+
+POST {{apiUrl}}/evaluations/{{hteEvaluationId}}/submit

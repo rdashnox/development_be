@@ -1,0 +1,611 @@
+###############################################################
+# Audit Logging Module — FR-11
+#
+# Manual REST Client Test Suite
+#
+# Order of execution:
+# 1. Health Check
+# 2. Administrator Login
+# 3. Retrieve Audit Logs
+# 4. Filter by Action
+# 5. Filter by Resource
+# 6. Filter by User
+# 7. Filter by Date Range
+# 8. Pagination
+# 9. Validation Tests
+# 10. Authorization Tests
+# 11. Read-Only API Tests
+# 12. Verify Login Audit Creation
+###############################################################
+## SUPPORTED AUDIT ACTIONS
+###############################################################
+
+### LOGIN
+### LOGOUT
+### PASSWORD_CHANGE
+### CREATE_USER
+### UPDATE_USER
+### CHANGE_ROLE
+### DEACTIVATE_USER
+### CREATE_INTERNSHIP
+### UPDATE_INTERNSHIP
+### CHANGE_INTERNSHIP_STATUS
+### ASSIGN_FACULTY_ADVISER
+### ASSIGN_HTE_SUPERVISOR
+### CREATE_ATTENDANCE
+### UPDATE_ATTENDANCE
+### VALIDATE_ATTENDANCE
+### REJECT_ATTENDANCE
+### CREATE_EVALUATION
+### UPDATE_EVALUATION
+### SUBMIT_EVALUATION
+### UPLOAD_DOCUMENT
+### APPROVE_DOCUMENT
+### REJECT_DOCUMENT
+### DELETE_DOCUMENT
+### GENERATE_REPORT
+
+###############################################################
+# Variables
+###############################################################
+
+@apiUrl=http://localhost:8000/api/v1
+
+### Paste the access token from administrator login here
+@adminAccessToken=PASTE_ADMIN_ACCESS_TOKEN_HERE
+
+### Paste a valid student access token here
+@studentAccessToken=PASTE_STUDENT_ACCESS_TOKEN_HERE
+
+### Paste a valid profile UUID here
+@userId=PASTE_USER_UUID_HERE
+
+### Paste a valid resource identifier here
+@resourceId=PASTE_RESOURCE_ID_HERE
+
+
+###############################################################
+# HEALTH
+###############################################################
+
+
+### Health Check
+###
+### Expected:
+### - HTTP 200
+###
+GET {{apiUrl}}/health
+Accept: application/json
+
+
+###############################################################
+# ADMINISTRATOR LOGIN
+###############################################################
+
+
+### Administrator Login
+###
+### Expected:
+### - HTTP 200
+### - success = true
+### - data.accessToken is returned
+### - data.user.role = administrator
+###
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "adminsbims1@grr.la",
+  "password": "Dev2026!"
+}
+
+
+###############################################################
+# AUDIT LOG RETRIEVAL
+###############################################################
+
+
+### Retrieve Default Audit Log Page
+###
+### Expected:
+### - HTTP 200
+### - success = true
+### - data.items is an array
+### - page = 1
+### - limit = 20
+###
+GET {{apiUrl}}/audit-logs
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Retrieve Audit Logs with Custom Pagination
+###
+GET {{apiUrl}}/audit-logs?page=1&limit=10
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# ACTION FILTERING
+###############################################################
+
+
+### Filter by LOGIN
+###
+GET {{apiUrl}}/audit-logs?action=LOGIN
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by CREATE_USER
+###
+GET {{apiUrl}}/audit-logs?action=CREATE_USER
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by UPDATE_USER
+###
+GET {{apiUrl}}/audit-logs?action=UPDATE_USER
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by CHANGE_ROLE
+###
+GET {{apiUrl}}/audit-logs?action=CHANGE_ROLE
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by DEACTIVATE_USER
+###
+GET {{apiUrl}}/audit-logs?action=DEACTIVATE_USER
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by CREATE_INTERNSHIP
+###
+GET {{apiUrl}}/audit-logs?action=CREATE_INTERNSHIP
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by UPDATE_INTERNSHIP
+###
+GET {{apiUrl}}/audit-logs?action=UPDATE_INTERNSHIP
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by CHANGE_INTERNSHIP_STATUS
+###
+GET {{apiUrl}}/audit-logs?action=CHANGE_INTERNSHIP_STATUS
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by ASSIGN_FACULTY_ADVISER
+###
+GET {{apiUrl}}/audit-logs?action=ASSIGN_FACULTY_ADVISER
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by ASSIGN_HTE_SUPERVISOR
+###
+GET {{apiUrl}}/audit-logs?action=ASSIGN_HTE_SUPERVISOR
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by CREATE_ATTENDANCE
+###
+GET {{apiUrl}}/audit-logs?action=CREATE_ATTENDANCE
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by UPDATE_ATTENDANCE
+###
+GET {{apiUrl}}/audit-logs?action=UPDATE_ATTENDANCE
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by VALIDATE_ATTENDANCE
+###
+GET {{apiUrl}}/audit-logs?action=VALIDATE_ATTENDANCE
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by REJECT_ATTENDANCE
+###
+GET {{apiUrl}}/audit-logs?action=REJECT_ATTENDANCE
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by CREATE_EVALUATION
+###
+GET {{apiUrl}}/audit-logs?action=CREATE_EVALUATION
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by UPDATE_EVALUATION
+###
+GET {{apiUrl}}/audit-logs?action=UPDATE_EVALUATION
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by SUBMIT_EVALUATION
+###
+GET {{apiUrl}}/audit-logs?action=SUBMIT_EVALUATION
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by UPLOAD_DOCUMENT
+###
+GET {{apiUrl}}/audit-logs?action=UPLOAD_DOCUMENT
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by APPROVE_DOCUMENT
+###
+GET {{apiUrl}}/audit-logs?action=APPROVE_DOCUMENT
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by REJECT_DOCUMENT
+###
+GET {{apiUrl}}/audit-logs?action=REJECT_DOCUMENT
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by DELETE_DOCUMENT
+###
+GET {{apiUrl}}/audit-logs?action=DELETE_DOCUMENT
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by GENERATE_REPORT
+###
+GET {{apiUrl}}/audit-logs?action=GENERATE_REPORT
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# RESOURCE FILTERING
+###############################################################
+
+
+### Filter by Resource Type
+###
+GET {{apiUrl}}/audit-logs?resourceType=AUTH
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by Resource Type — USER
+###
+GET {{apiUrl}}/audit-logs?resourceType=USER
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by Resource Type — INTERNSHIP
+###
+GET {{apiUrl}}/audit-logs?resourceType=INTERNSHIP
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by Resource Type — DOCUMENT
+###
+GET {{apiUrl}}/audit-logs?resourceType=document
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by Resource ID
+###
+GET {{apiUrl}}/audit-logs?resourceId={{resourceId}}
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# USER FILTERING
+###############################################################
+
+
+### Filter by Actor User ID
+###
+GET {{apiUrl}}/audit-logs?userId={{userId}}
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# DATE RANGE FILTERING
+###############################################################
+
+
+### Filter by Date Range
+###
+GET {{apiUrl}}/audit-logs?from=2026-09-01T00:00:00.000Z&to=2026-09-11T23:59:59.999Z
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Filter by Date Range with Action
+###
+GET {{apiUrl}}/audit-logs?action=LOGIN&from=2026-09-01T00:00:00.000Z&to=2026-09-11T23:59:59.999Z
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# PAGINATION
+###############################################################
+
+
+### Page 1 with Limit 2
+###
+GET {{apiUrl}}/audit-logs?page=1&limit=2
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Page 2 with Limit 2
+###
+GET {{apiUrl}}/audit-logs?page=2&limit=2
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Maximum Page Size
+###
+GET {{apiUrl}}/audit-logs?page=1&limit=100
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Combined Filters and Pagination
+###
+GET {{apiUrl}}/audit-logs?action=LOGIN&resourceType=AUTH&page=1&limit=10
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# VALIDATION TESTS
+###############################################################
+
+
+### Invalid Audit Action
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?action=INVALID_ACTION
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Invalid User ID
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?userId=not-a-uuid
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Invalid Page Number
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?page=0
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Negative Page Number
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?page=-1
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Invalid Limit
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?limit=0
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Limit Above Maximum
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?limit=101
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Invalid From Date
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?from=not-a-date
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Invalid To Date
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?to=not-a-date
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+### Reversed Date Range
+###
+### Expected:
+### - HTTP 400
+###
+GET {{apiUrl}}/audit-logs?from=2026-09-11T00:00:00.000Z&to=2026-09-01T00:00:00.000Z
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# AUTHENTICATION AND AUTHORIZATION
+###############################################################
+
+
+### Unauthenticated Request
+###
+### Expected:
+### - HTTP 401
+###
+GET {{apiUrl}}/audit-logs
+Accept: application/json
+
+
+### Invalid Access Token
+###
+### Expected:
+### - HTTP 401
+###
+GET {{apiUrl}}/audit-logs
+Authorization: Bearer invalid-token
+Accept: application/json
+
+
+### Student Access
+###
+### Expected:
+### - HTTP 403
+###
+GET {{apiUrl}}/audit-logs
+Authorization: Bearer {{studentAccessToken}}
+Accept: application/json
+
+
+### Administrator Access
+###
+### Expected:
+### - HTTP 200
+###
+GET {{apiUrl}}/audit-logs
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# READ-ONLY API TESTS
+###############################################################
+
+
+### Create Audit Log Through Public API
+###
+### Expected:
+### - HTTP 404
+###
+POST {{apiUrl}}/audit-logs
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "action": "CREATE_INTERNSHIP",
+  "resourceType": "internship",
+  "resourceId": "{{resourceId}}",
+  "details": {
+    "test": true
+  }
+}
+
+
+### Modify Audit Log Through Public API
+###
+### Expected:
+### - HTTP 404
+###
+PATCH {{apiUrl}}/audit-logs/{{resourceId}}
+Authorization: Bearer {{adminAccessToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "action": "DELETE_DOCUMENT"
+}
+
+
+### Delete Audit Log Through Public API
+###
+### Expected:
+### - HTTP 404
+###
+DELETE {{apiUrl}}/audit-logs/{{resourceId}}
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json
+
+
+###############################################################
+# LOGIN AUDIT VERIFICATION
+###############################################################
+
+
+### Login to Generate a LOGIN Audit Event
+###
+### Expected:
+### - HTTP 200
+### - A LOGIN audit record is created
+###
+POST {{apiUrl}}/auth/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "adminsbims1@grr.la",
+  "password": "Dev2026!"
+}
+
+
+### Retrieve Recent LOGIN Audit Events
+###
+### Expected:
+### - HTTP 200
+### - Latest record contains action = LOGIN
+###
+GET {{apiUrl}}/audit-logs?action=LOGIN&resourceType=AUTH&page=1&limit=10
+Authorization: Bearer {{adminAccessToken}}
+Accept: application/json

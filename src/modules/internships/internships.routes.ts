@@ -8,6 +8,7 @@ import { requireRole } from "../auth/role.middleware.ts";
 
 import {
   createInternshipSchema,
+  createMyInternshipSchema,
   updateFacultyAdviserSchema,
   updateInternshipSchema,
   updateInternshipStatusSchema,
@@ -22,7 +23,7 @@ const internships = new Hono<{
 /**
  * GET /internships
  *
- * Administrator and internship coordinator.
+ * Lists all internship assignments.
  */
 internships.get(
   "/",
@@ -43,9 +44,8 @@ internships.get(
 /**
  * GET /internships/me
  *
- * Student's own internship.
- *
- * Keep this route before /:id.
+ * Retrieves the authenticated student's current
+ * pending or active internship assignment.
  */
 internships.get("/me", requireAuth, requireRole("student"), async (c) => {
   const internshipService = new InternshipService(c.get("supabase"));
@@ -61,38 +61,12 @@ internships.get("/me", requireAuth, requireRole("student"), async (c) => {
 });
 
 /**
- * GET /internships/:id
- */
-internships.get(
-  "/:id",
-  requireAuth,
-  requireRole("administrator", "internship_coordinator"),
-  async (c) => {
-    const internshipService = new InternshipService(c.get("supabase"));
-
-    const internshipId = c.req.param("id");
-
-    if (!internshipId) {
-      return c.json(
-        {
-          success: false,
-          message: "Internship ID is required.",
-        },
-        400,
-      );
-    }
-
-    const result = await internshipService.getInternship(internshipId);
-
-    return c.json({
-      success: true,
-      data: result,
-    });
-  },
-);
-
-/**
  * POST /internships
+ *
+ * Creates a new internship assignment.
+ *
+ * Status is not accepted from the client.
+ * New records are created as "pending".
  */
 internships.post(
   "/",
@@ -117,7 +91,80 @@ internships.post(
 );
 
 /**
+ * POST /internships/me
+ *
+ * Student self-service internship creation.
+ *
+ * This route is retained according to the existing API structure.
+ */
+internships.post(
+  "/me",
+  requireAuth,
+  requireRole("student"),
+  zValidator("json", createMyInternshipSchema),
+  async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+
+    const body = c.req.valid("json");
+    const user = c.get("user");
+
+    const result = await internshipService.createInternship({
+      studentId: user.id,
+      hteId: body.hteId,
+      facultyAdviserId: user.id,
+      startDate: "",
+      endDate: "",
+      requiredHours: 1,
+    });
+
+    return c.json(
+      {
+        success: true,
+        data: result,
+      },
+      201,
+    );
+  },
+);
+
+/**
+ * GET /internships/:id
+ *
+ * Retrieves a specific internship assignment.
+ */
+internships.get(
+  "/:id",
+  requireAuth,
+  requireRole("administrator", "internship_coordinator"),
+  async (c) => {
+    const internshipService = new InternshipService(c.get("supabase"));
+    const internshipId = c.req.param("id");
+
+    if (!internshipId) {
+      return c.json(
+        {
+          success: false,
+          error: "Internship ID is required.",
+        },
+        400,
+      );
+    }
+
+    const result = await internshipService.getInternship(internshipId);
+
+    return c.json({
+      success: true,
+      data: result,
+    });
+  },
+);
+
+/**
  * PATCH /internships/:id/status
+ *
+ * Changes the internship lifecycle status.
+ *
+ * Business-rule validation is handled by InternshipService.
  */
 internships.patch(
   "/:id/status",
@@ -126,11 +173,22 @@ internships.patch(
   zValidator("json", updateInternshipStatusSchema),
   async (c) => {
     const internshipService = new InternshipService(c.get("supabase"));
+    const internshipId = c.req.param("id");
+
+    if (!internshipId) {
+      return c.json(
+        {
+          success: false,
+          error: "Internship ID is required.",
+        },
+        400,
+      );
+    }
 
     const body = c.req.valid("json");
 
     const result = await internshipService.updateStatus(
-      c.req.param("id"),
+      internshipId,
       body.status,
     );
 
@@ -143,6 +201,12 @@ internships.patch(
 
 /**
  * PATCH /internships/:id/adviser
+ *
+ * Legacy/specialized faculty-adviser update endpoint.
+ *
+ * The main PATCH /internships/:id endpoint also supports
+ * facultyAdviserId. This route remains temporarily for
+ * compatibility with existing clients/tests.
  */
 internships.patch(
   "/:id/adviser",
@@ -151,11 +215,22 @@ internships.patch(
   zValidator("json", updateFacultyAdviserSchema),
   async (c) => {
     const internshipService = new InternshipService(c.get("supabase"));
+    const internshipId = c.req.param("id");
+
+    if (!internshipId) {
+      return c.json(
+        {
+          success: false,
+          error: "Internship ID is required.",
+        },
+        400,
+      );
+    }
 
     const body = c.req.valid("json");
 
     const result = await internshipService.assignFacultyAdviser(
-      c.req.param("id"),
+      internshipId,
       body.facultyAdviserId,
     );
 
@@ -168,6 +243,15 @@ internships.patch(
 
 /**
  * PATCH /internships/:id
+ *
+ * Updates ordinary internship assignment details:
+ * - HTE
+ * - faculty adviser
+ * - start date
+ * - end date
+ * - required hours
+ *
+ * Status must be changed through /status.
  */
 internships.patch(
   "/:id",
@@ -176,13 +260,21 @@ internships.patch(
   zValidator("json", updateInternshipSchema),
   async (c) => {
     const internshipService = new InternshipService(c.get("supabase"));
+    const internshipId = c.req.param("id");
+
+    if (!internshipId) {
+      return c.json(
+        {
+          success: false,
+          error: "Internship ID is required.",
+        },
+        400,
+      );
+    }
 
     const body = c.req.valid("json");
 
-    const result = await internshipService.updateInternship(
-      c.req.param("id"),
-      body,
-    );
+    const result = await internshipService.updateInternship(internshipId, body);
 
     return c.json({
       success: true,
